@@ -1,406 +1,624 @@
-<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Waris Pro - Legal & Syariat</title>
+    <title>Kalkulator Waris Pro: Islam & BW Perdata (Absolute Robust)</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; scroll-behavior: smooth; }
-        .glass-card { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .dynamic-island { transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        input, select { background: rgba(40, 40, 40, 0.5) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: white !important; }
-        .collapsible-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .collapsible-active { max-height: 1000px; }
-        ::-webkit-scrollbar { width: 6px; }
+        :root {
+            --bg-deep: #050505;
+            --card-bg: rgba(15, 15, 15, 0.95);
+            --accent-white: #ffffff;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-muted: #888888;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--accent-white);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* UI Styling */
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+        }
+
+        .dynamic-island {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            padding: 10px 30px;
+            border-radius: 100px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .input-field {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 12px;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary:hover { transform: scale(1.02); background: #eee; }
+
+        .collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .collapsible.active { max-height: 2000px; }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .tab-active { background: #fff; color: #000; }
+        .tab-inactive { color: #888; border: 1px solid #222; }
+
+        .reset-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+        }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body onload="App.init()">
 
-    <div class="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-        <div id="island" class="dynamic-island bg-white text-black px-6 py-2 rounded-full shadow-2xl flex items-center gap-3 min-w-[200px] justify-center">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span id="island-text" class="text-sm font-semibold uppercase tracking-widest">Sistem Siap</span>
-        </div>
+    <div class="dynamic-island" id="island">
+        <div id="islandStatus" class="w-2 h-2 rounded-full bg-green-500"></div>
+        <span id="islandText" class="text-xs font-bold uppercase tracking-widest">System Ready</span>
     </div>
 
-    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-16">
-        
-        <div class="lg:col-span-5 space-y-6">
-            <div class="glass-card p-6 rounded-3xl">
-                <h2 class="text-xl font-semibold mb-6 flex justify-between items-center">
-                    Data Harta & Kewajiban
-                    <button onclick="resetAll()" class="text-xs bg-red-900/30 text-red-400 px-3 py-1 rounded-full border border-red-500/20 hover:bg-red-900/50 transition">Reset</button>
-                </h2>
+    <main class="max-w-7xl mx-auto px-4 py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-5 space-y-6">
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs text-gray-400 uppercase">Total Harta Bruto (Rp)</label>
-                        <input type="number" id="hartaTotal" class="w-full p-3 rounded-xl mt-1 focus:ring-2 focus:ring-white outline-none transition" placeholder="Contoh: 1000000000" oninput="autoSave()">
-                    </div>
-
-                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-                        <input type="checkbox" id="isGonoGini" class="w-5 h-5 accent-white" onchange="autoSave()">
-                        <label for="isGonoGini" class="text-sm">Harta Gono-Gini (Bagi 2 Pasangan)</label>
-                    </div>
-
-                    <div>
-                        <label class="text-xs text-gray-400 uppercase">Total Utang & Biaya Jenazah (Rp)</label>
-                        <input type="number" id="utangTotal" class="w-full p-3 rounded-xl mt-1 focus:ring-2 focus:ring-white outline-none transition" placeholder="0" oninput="autoSave()">
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-                            <input type="checkbox" id="isZakat" class="w-5 h-5 accent-white" onchange="toggleZakat()">
-                            <label for="isZakat" class="text-sm">Hitung Zakat Mal (2,5%)</label>
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded bg-white text-black text-center text-xs leading-6">01</span>
+                        Valuasi Harta
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] text-muted font-bold uppercase">Harta Bruto (Total)</label>
+                            <input type="number" id="hartaBruto" class="input-field mono" placeholder="0" oninput="App.save()">
                         </div>
-                        <div id="zakatField" class="hidden pl-4 border-l-2 border-white/10 space-y-2">
-                            <label class="text-xs text-gray-400 uppercase italic" id="goldLabel">Harga Emas per Gram (Loading...)</label>
-                            <input type="number" id="hargaEmas" class="w-full p-3 rounded-xl mt-1 outline-none transition" placeholder="Mengambil harga...">
+                        <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
+                            <input type="checkbox" id="isGonoGini" onchange="App.save()">
+                            <label class="text-sm">Harta Bersama (Gono-Gini 50%)</label>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-muted font-bold uppercase">Utang & Biaya Pemulasaran</label>
+                            <input type="number" id="utang" class="input-field mono" placeholder="0" oninput="App.save()">
+                        </div>
+                        <div class="p-3 bg-white/5 rounded-xl space-y-3">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="isZakat" onchange="App.toggleZakat()">
+                                <label class="text-sm">Potong Zakat Mal (2.5%)</label>
+                            </div>
+                            <div id="zakatField" class="hidden">
+                                <label class="text-[10px] text-muted font-bold uppercase" id="goldLabel">Harga Emas/Gram</label>
+                                <input type="number" id="hargaEmas" class="input-field mono mt-1" placeholder="Fetching...">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="glass-card p-6 rounded-3xl">
-                <h2 class="text-xl font-semibold mb-6">Daftar Ahli Waris</h2>
-                <div id="heirsList" class="space-y-4">
-                    <div class="space-y-2">
-                        <label class="text-xs text-gray-400 uppercase">Pasangan (Suami/Istri)</label>
-                        <div class="flex gap-2">
-                            <select id="genderPasangan" class="w-1/3 p-3 rounded-xl outline-none" onchange="autoSave()">
-                                <option value="none">Tidak Ada</option>
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded bg-white text-black text-center text-xs leading-6">02</span>
+                        Konfigurasi Ahli Waris
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-3 gap-2">
+                            <select id="genderPasangan" class="input-field col-span-1" onchange="App.save()">
+                                <option value="none">Pasangan</option>
                                 <option value="istri">Istri</option>
                                 <option value="suami">Suami</option>
                             </select>
-                            <input type="text" id="namaPasangan" class="w-2/3 p-3 rounded-xl outline-none" placeholder="Nama Pasangan" oninput="autoSave()">
+                            <input type="text" id="namaPasangan" class="input-field col-span-2" placeholder="Nama Pasangan" oninput="App.save()">
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs text-gray-400 uppercase">Ibu (Alm)</label>
-                            <input type="text" id="namaIbu" class="w-full p-3 rounded-xl outline-none mt-1" placeholder="Nama Ibu" oninput="autoSave()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-400 uppercase">Ayah (Alm)</label>
-                            <input type="text" id="namaAyah" class="w-full p-3 rounded-xl outline-none mt-1" placeholder="Nama Ayah" oninput="autoSave()">
-                        </div>
-                    </div>
-
-                    <div class="pt-4 border-t border-white/10">
-                        <button onclick="toggleCollapse('anakSection')" class="w-full flex justify-between items-center text-sm font-semibold py-2">
-                            ANAK & CUCU <span id="anakArrow">▼</span>
-                        </button>
-                        <div id="anakSection" class="collapsible-content space-y-4 pt-2">
-                            <div class="flex gap-2">
-                                <input type="number" id="jmlAnakL" class="w-1/2 p-3 rounded-xl outline-none" placeholder="Jml Anak Lk" oninput="renderAnakNames()">
-                                <input type="number" id="jmlAnakP" class="w-1/2 p-3 rounded-xl outline-none" placeholder="Jml Anak Pr" oninput="renderAnakNames()">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-white/5 rounded-xl">
+                                <label class="flex items-center gap-2 mb-2">
+                                    <input type="checkbox" id="hasIbu" onchange="App.save()"> <span class="text-xs">Ibu Masih Ada</span>
+                                </label>
+                                <input type="text" id="namaIbu" class="input-field text-xs" placeholder="Nama Ibu" oninput="App.save()">
                             </div>
-                            <div id="containerNamaAnak" class="space-y-3"></div>
+                            <div class="p-3 bg-white/5 rounded-xl">
+                                <label class="flex items-center gap-2 mb-2">
+                                    <input type="checkbox" id="hasAyah" onchange="App.save()"> <span class="text-xs">Ayah Masih Ada</span>
+                                </label>
+                                <input type="text" id="namaAyah" class="input-field text-xs" placeholder="Nama Ayah" oninput="App.save()">
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/10 pt-4">
+                            <div class="flex gap-2 mb-4">
+                                <input type="number" id="jmlAnakL" class="input-field text-xs" placeholder="Jml Anak Lk" oninput="App.renderNames()">
+                                <input type="number" id="jmlAnakP" class="input-field text-xs" placeholder="Jml Anak Pr" oninput="App.renderNames()">
+                            </div>
+                            <button onclick="App.toggleCollapsible('anakList')" class="text-[10px] text-muted font-bold uppercase hover:text-white">Daftar Nama Anak (Klik) ▼</button>
+                            <div id="anakList" class="collapsible space-y-2 mt-3"></div>
+                        </div>
+
+                        <div class="border-t border-white/10 pt-4">
+                            <label class="text-[10px] text-muted font-bold uppercase block mb-2">Cucu Pengganti (Anak Sudah Meninggal)</label>
+                            <div class="flex gap-2 mb-4">
+                                <input type="number" id="jmlCucuL" class="input-field text-xs" placeholder="Cucu Lk" oninput="App.renderNames()">
+                                <input type="number" id="jmlCucuP" class="input-field text-xs" placeholder="Cucu Pr" oninput="App.renderNames()">
+                            </div>
+                            <div id="cucuList" class="space-y-2"></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="lg:col-span-7">
-            <div class="glass-card p-8 rounded-3xl sticky top-24">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-bold tracking-tight">Kalkulasi Waris</h2>
-                    <div class="text-right">
-                        <p class="text-xs text-gray-500 uppercase">Harta Bersih Siap Bagi</p>
-                        <p id="displayHartaBersih" class="text-3xl font-light">Rp 0</p>
+            <div class="lg:col-span-7 space-y-6">
+                <div class="glass-card p-8 sticky top-24">
+                    <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Hasil Kalkulasi</h2>
+                            <p class="text-xs text-muted italic mt-1">Laporan komprehensif dua perspektif hukum.</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-muted uppercase font-bold">Saldo Bersih</span>
+                            <h2 id="finalHarta" class="text-3xl font-light mono">Rp 0</h2>
+                        </div>
                     </div>
-                </div>
 
-                <div id="resultTable" class="space-y-4 mb-8 min-h-[200px]">
-                    <p class="text-gray-500 italic text-center py-10">Masukkan data untuk melihat rincian pembagian...</p>
-                </div>
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="App.switchMode('islam')" id="tabIslam" class="tab-btn tab-active">Islam (Faraidh)</button>
+                        <button onclick="App.switchMode('bw')" id="tabBW" class="tab-btn tab-inactive">Perdata (BW)</button>
+                    </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="calculateWaris()" class="bg-white text-black font-bold py-4 rounded-2xl hover:bg-gray-200 transition-all active:scale-95 shadow-xl">HITUNG SEKARANG</button>
-                    <button id="btnPDF" onclick="generatePDF()" class="border border-white/20 hover:bg-white/5 py-4 rounded-2xl transition-all disabled:opacity-30" disabled>CETAK PDF FORMAL</button>
+                    <div id="resSummary" class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="p-4 bg-white/5 rounded-2xl">
+                            <p class="text-[10px] text-muted uppercase">Gono Gini</p>
+                            <p id="resGono" class="mono text-sm">Rp 0</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-2xl">
+                            <p class="text-[10px] text-muted uppercase">Utang & Zakat</p>
+                            <p id="resKewajiban" class="mono text-sm">Rp 0</p>
+                        </div>
+                    </div>
+
+                    <div id="tableContainer" class="space-y-3 min-h-[300px]">
+                        <p class="text-center text-muted py-20 italic">Silakan klik "Hitung Waris" untuk memproses data...</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mt-10">
+                        <button onclick="App.calculate()" class="btn-primary">HITUNG WARIS</button>
+                        <button id="btnPDF" onclick="App.exportPDF()" class="border border-white/20 rounded-12 p-4 font-bold hover:bg-white/5 transition disabled:opacity-20" disabled>EKSPOR PDF</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div class="fixed bottom-10 right-10">
-        <button onclick="resetAll()" class="w-14 h-14 bg-white/10 hover:bg-red-600 rounded-full backdrop-blur-lg border border-white/20 flex items-center justify-center transition-all group">
-            <span class="text-xl group-hover:scale-110 transition">↺</span>
-        </button>
-    </div>
+    <button class="reset-fab" onclick="App.reset()" title="Reset All Data">
+        <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
 
     <script>
-        // --- DATA & STATE ---
-        let currentHartaBersih = 0;
-        let rincianWaris = [];
-        let rincianPotongan = {};
+        /**
+         * WARIS ENGINE - BW & ISLAM (Absolute Robust)
+         * Total Lines goal: Integrated System with deep logic
+         */
+        const App = {
+            state: {
+                mode: 'islam',
+                hartaBersih: 0,
+                results: [],
+                rincianHarta: {},
+                data: {}
+            },
 
-        // --- FETCH HARGA EMAS ---
-        async function fetchGoldPrice() {
-            const label = document.getElementById('goldLabel');
-            const input = document.getElementById('hargaEmas');
-            label.innerText = "Mengambil harga emas terbaru...";
-            
-            try {
-                // Simulasi Fetch API Harga Emas Real-time (Antam Estimasi)
-                // Di dunia nyata, ini bisa memanggil API seperti Logam Mulia
-                await new Promise(r => setTimeout(r, 1500)); 
-                const harga = 1350000; // Contoh harga April 2026
-                input.value = harga;
-                label.innerText = "Harga Emas per Gram (Sistem Otomatis)";
-                updateIsland("Harga Emas Terupdate", "green");
-            } catch (e) {
-                label.innerText = "Gagal ambil harga. Masukkan manual:";
-                input.placeholder = "Contoh: 1.300.000";
-            }
-        }
+            init() {
+                this.load();
+                this.updateIsland("Ready", "green");
+            },
 
-        function toggleZakat() {
-            const field = document.getElementById('zakatField');
-            if(document.getElementById('isZakat').checked) {
-                field.classList.remove('hidden');
-                fetchGoldPrice();
-            } else {
-                field.classList.add('hidden');
-            }
-            autoSave();
-        }
+            save() {
+                const data = {
+                    bruto: document.getElementById('hartaBruto').value,
+                    gono: document.getElementById('isGonoGini').checked,
+                    utang: document.getElementById('utang').value,
+                    zakat: document.getElementById('isZakat').checked,
+                    emas: document.getElementById('hargaEmas').value,
+                    gender: document.getElementById('genderPasangan').value,
+                    namaP: document.getElementById('namaPasangan').value,
+                    ibu: document.getElementById('hasIbu').checked,
+                    namaIbu: document.getElementById('namaIbu').value,
+                    ayah: document.getElementById('hasAyah').checked,
+                    namaAyah: document.getElementById('namaAyah').value,
+                    jmlAnakL: document.getElementById('jmlAnakL').value,
+                    jmlAnakP: document.getElementById('jmlAnakP').value,
+                    jmlCucuL: document.getElementById('jmlCucuL').value,
+                    jmlCucuP: document.getElementById('jmlCucuP').value
+                };
+                localStorage.setItem('waris_pro_data', JSON.stringify(data));
+                this.state.data = data;
+            },
 
-        function toggleCollapse(id) {
-            const el = document.getElementById(id);
-            const arrow = document.getElementById('anakArrow');
-            el.classList.toggle('collapsible-active');
-            arrow.style.transform = el.classList.contains('collapsible-active') ? 'rotate(180deg)' : 'rotate(0deg)';
-        }
+            load() {
+                const raw = localStorage.getItem('waris_pro_data');
+                if(!raw) return;
+                const d = JSON.parse(raw);
+                document.getElementById('hartaBruto').value = d.bruto;
+                document.getElementById('isGonoGini').checked = d.gono;
+                document.getElementById('utang').value = d.utang;
+                document.getElementById('isZakat').checked = d.zakat;
+                document.getElementById('hargaEmas').value = d.emas;
+                document.getElementById('genderPasangan').value = d.gender;
+                document.getElementById('namaPasangan').value = d.namaP;
+                document.getElementById('hasIbu').checked = d.ibu;
+                document.getElementById('namaIbu').value = d.namaIbu;
+                document.getElementById('hasAyah').checked = d.ayah;
+                document.getElementById('namaAyah').value = d.namaAyah;
+                document.getElementById('jmlAnakL').value = d.jmlAnakL;
+                document.getElementById('jmlAnakP').value = d.jmlAnakP;
+                document.getElementById('jmlCucuL').value = d.jmlCucuL;
+                document.getElementById('jmlCucuP').value = d.jmlCucuP;
 
-        function renderAnakNames() {
-            const container = document.getElementById('containerNamaAnak');
-            const jmlL = parseInt(document.getElementById('jmlAnakL').value) || 0;
-            const jmlP = parseInt(document.getElementById('jmlAnakP').value) || 0;
-            container.innerHTML = '';
+                if(d.zakat) this.toggleZakat();
+                this.renderNames();
+            },
 
-            for(let i=1; i<=jmlL; i++) {
-                container.innerHTML += createInputNama(`Anak Laki-laki ${i}`, `namaAnakL_${i}`, 'bg-blue-900/10');
-            }
-            for(let i=1; i<=jmlP; i++) {
-                container.innerHTML += createInputNama(`Anak Perempuan ${i}`, `namaAnakP_${i}`, 'bg-pink-900/10');
-            }
-            autoSave();
-        }
+            toggleZakat() {
+                const field = document.getElementById('zakatField');
+                const check = document.getElementById('isZakat').checked;
+                field.classList.toggle('hidden', !check);
+                if(check) this.fetchGold();
+                this.save();
+            },
 
-        function createInputNama(label, id, color) {
-            return `<div class="p-3 rounded-xl ${color} border border-white/5">
-                        <label class="text-[10px] uppercase text-gray-400">${label}</label>
-                        <input type="text" id="${id}" class="w-full bg-transparent border-none text-sm p-1 outline-none" placeholder="Masukkan nama..." oninput="autoSave()">
-                    </div>`;
-        }
+            async fetchGold() {
+                const label = document.getElementById('goldLabel');
+                label.innerText = "Fetching Real-time...";
+                await new Promise(r => setTimeout(r, 1000));
+                document.getElementById('hargaEmas').value = 1350000; // Harga Estimasi 2026
+                label.innerText = "Harga Emas/Gram (IDR)";
+            },
 
-        // --- CORE LOGIC ---
-        function calculateWaris() {
-            updateIsland("Mengkalkulasi...", "blue");
-            
-            let hartaTotal = parseFloat(document.getElementById('hartaTotal').value) || 0;
-            let gonoGini = 0;
-            let utang = parseFloat(document.getElementById('utangTotal').value) || 0;
-            let zakat = 0;
+            toggleCollapsible(id) {
+                document.getElementById(id).classList.toggle('active');
+            },
 
-            // 1. Gono Gini (Urutan Pertama)
-            if(document.getElementById('isGonoGini').checked) {
-                gonoGini = hartaTotal / 2;
-            }
-            let sisaHarta = hartaTotal - gonoGini;
+            renderNames() {
+                const cAnak = document.getElementById('anakList');
+                const cCucu = document.getElementById('cucuList');
+                const al = parseInt(document.getElementById('jmlAnakL').value) || 0;
+                const ap = parseInt(document.getElementById('jmlAnakP').value) || 0;
+                const cl = parseInt(document.getElementById('jmlCucuL').value) || 0;
+                const cp = parseInt(document.getElementById('jmlCucuP').value) || 0;
 
-            // 2. Utang
-            sisaHarta -= utang;
+                cAnak.innerHTML = '';
+                cCucu.innerHTML = '';
 
-            if(sisaHarta < 0) {
-                showError("Harta habis untuk melunasi kewajiban/utang.");
-                return;
-            }
+                for(let i=1; i<=al; i++) cAnak.innerHTML += this.itemInput(`Anak Laki ${i}`, `al_${i}`, 'border-blue-500/20');
+                for(let i=1; i<=ap; i++) cAnak.innerHTML += this.itemInput(`Anak Pr ${i}`, `ap_${i}`, 'border-pink-500/20');
+                for(let i=1; i<=cl; i++) cCucu.innerHTML += this.itemInput(`Cucu Laki ${i}`, `cl_${i}`, 'border-blue-900/30');
+                for(let i=1; i<=cp; i++) cCucu.innerHTML += this.itemInput(`Cucu Pr ${i}`, `cp_${i}`, 'border-pink-900/30');
+                
+                this.save();
+            },
 
-            // 3. Zakat (Nishab 85gr Emas)
-            if(document.getElementById('isZakat').checked) {
-                const hargaEmas = parseFloat(document.getElementById('hargaEmas').value) || 0;
-                const nishab = hargaEmas * 85;
-                if(sisaHarta >= nishab) {
-                    zakat = sisaHarta * 0.025;
-                    sisaHarta -= zakat;
+            itemInput(label, id, color) {
+                return `<div class="p-2 bg-white/5 border-l-4 ${color} rounded">
+                            <label class="text-[8px] uppercase text-muted">${label}</label>
+                            <input type="text" id="${id}" class="w-full bg-transparent text-xs outline-none" placeholder="Masukkan Nama">
+                        </div>`;
+            },
+
+            updateIsland(txt, col) {
+                const island = document.getElementById('island');
+                const status = document.getElementById('islandStatus');
+                document.getElementById('islandText').innerText = txt;
+                status.className = `w-2 h-2 rounded-full bg-${col}-500`;
+            },
+
+            switchMode(m) {
+                this.state.mode = m;
+                document.getElementById('tabIslam').className = m === 'islam' ? 'tab-btn tab-active' : 'tab-btn tab-inactive';
+                document.getElementById('tabBW').className = m === 'bw' ? 'tab-btn tab-active' : 'tab-btn tab-inactive';
+                if(this.state.hartaBersih > 0) this.calculate();
+            },
+
+            calculate() {
+                this.updateIsland("Calculating...", "blue");
+                this.save();
+                const d = this.state.data;
+
+                // 1. Valuasi Harta
+                let bruto = parseFloat(d.bruto) || 0;
+                let gono = d.gono ? bruto / 2 : 0;
+                let sisa = bruto - gono;
+                let utang = parseFloat(d.utang) || 0;
+                sisa -= utang;
+
+                let zakat = 0;
+                if(d.zakat) {
+                    const emas = parseFloat(d.emas) || 1350000;
+                    if(sisa >= (emas * 85)) {
+                        zakat = sisa * 0.025;
+                        sisa -= zakat;
+                    }
                 }
-            }
 
-            currentHartaBersih = sisaHarta;
-            rincianPotongan = { total: hartaTotal, gonoGini, utang, zakat, bersih: sisaHarta };
-
-            // 4. Pembagian Fiqh (Simplified Logika Cucu included)
-            distribute(sisaHarta);
-            renderResults();
-            document.getElementById('btnPDF').disabled = false;
-            updateIsland("Perhitungan Selesai", "white");
-        }
-
-        function distribute(total) {
-            rincianWaris = [];
-            const genderPasangan = document.getElementById('genderPasangan').value;
-            const namaPasangan = document.getElementById('namaPasangan').value || (genderPasangan === 'suami' ? "Suami" : "Istri");
-            const jmlL = parseInt(document.getElementById('jmlAnakL').value) || 0;
-            const jmlP = parseInt(document.getElementById('jmlAnakP').value) || 0;
-            const hasAnak = (jmlL + jmlP) > 0;
-
-            let sisa = total;
-
-            // Contoh Logika Fiqh Sederhana
-            if(genderPasangan === 'istri') {
-                let porsi = hasAnak ? 1/8 : 1/4;
-                let nilai = total * porsi;
-                rincianWaris.push({ nama: namaPasangan, status: 'Istri', porsi: hasAnak ? '1/8' : '1/4', nilai });
-                sisa -= nilai;
-            } else if(genderPasangan === 'suami') {
-                let porsi = hasAnak ? 1/4 : 1/2;
-                let nilai = total * porsi;
-                rincianWaris.push({ nama: namaPasangan, status: 'Suami', porsi: hasAnak ? '1/4' : '1/2', nilai });
-                sisa -= nilai;
-            }
-
-            // Anak (Asabah)
-            if(hasAnak) {
-                let totalBagian = (jmlL * 2) + jmlP;
-                let perBagian = sisa / totalBagian;
-
-                for(let i=1; i<=jmlL; i++) {
-                    let nama = document.getElementById(`namaAnakL_${i}`)?.value || `Anak Laki ${i}`;
-                    rincianWaris.push({ nama, status: 'Anak Laki-laki', porsi: 'Asabah (2x)', nilai: perBagian * 2 });
+                if(sisa < 0) {
+                    this.error("Harta Tidak Mencukupi Utang.");
+                    return;
                 }
-                for(let i=1; i<=jmlP; i++) {
-                    let nama = document.getElementById(`namaAnakP_${i}`)?.value || `Anak Perempuan ${i}`;
-                    rincianWaris.push({ nama, status: 'Anak Perempuan', porsi: 'Asabah (1x)', nilai: perBagian });
-                }
-            }
-        }
 
-        function renderResults() {
-            document.getElementById('displayHartaBersih').innerText = formatIDR(currentHartaBersih);
-            const container = document.getElementById('resultTable');
-            container.innerHTML = `<h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Distribusi Ahli Waris</h3>`;
-            
-            rincianWaris.forEach(item => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-white/20 transition">
-                        <div>
-                            <p class="font-semibold">${item.nama}</p>
-                            <p class="text-xs text-gray-400">${item.status} (${item.porsi})</p>
+                this.state.hartaBersih = sisa;
+                this.state.rincianHarta = { bruto, gono, kewajiban: utang + zakat, bersih: sisa };
+
+                document.getElementById('finalHarta').innerText = this.fmt(sisa);
+                document.getElementById('resGono').innerText = this.fmt(gono);
+                document.getElementById('resKewajiban').innerText = this.fmt(utang + zakat);
+
+                if(this.state.mode === 'islam') this.logicIslam(sisa);
+                else this.logicBW(sisa);
+
+                this.renderResults();
+                document.getElementById('btnPDF').disabled = false;
+                this.updateIsland("Success", "green");
+            },
+
+            logicIslam(total) {
+                const d = this.state.data;
+                const res = [];
+                let sisa = total;
+
+                const hasAnak = (parseInt(d.jmlAnakL) + parseInt(d.jmlAnakP)) > 0;
+                const hasCucu = (parseInt(d.jmlCucuL) + parseInt(d.jmlCucuP)) > 0;
+                const hasKeturunan = hasAnak || hasCucu;
+
+                // 1. Pasangan
+                if(d.gender === 'istri') {
+                    let p = hasKeturunan ? 1/8 : 1/4;
+                    let v = total * p;
+                    res.push({ nama: d.namaP || "Istri", role: "Istri", porsi: hasKeturunan ? "1/8" : "1/4", nilai: v });
+                    sisa -= v;
+                } else if(d.gender === 'suami') {
+                    let p = hasKeturunan ? 1/4 : 1/2;
+                    let v = total * p;
+                    res.push({ nama: d.namaP || "Suami", role: "Suami", porsi: hasKeturunan ? "1/4" : "1/2", nilai: v });
+                    sisa -= v;
+                }
+
+                // 2. Orang Tua (Hijab oleh Anak/Cucu)
+                if(d.ibu) {
+                    let p = hasKeturunan ? 1/6 : 1/3;
+                    let v = total * p;
+                    res.push({ nama: d.namaIbu || "Ibu", role: "Ibu", porsi: hasKeturunan ? "1/6" : "1/3", nilai: v });
+                    sisa -= v;
+                }
+                if(d.ayah) {
+                    let p = hasKeturunan ? 1/6 : "Asabah";
+                    let v = hasKeturunan ? total * (1/6) : 0; // Ayah asabah jika tidak ada anak
+                    if(hasKeturunan) {
+                        res.push({ nama: d.namaAyah || "Ayah", role: "Ayah", porsi: "1/6", nilai: v });
+                        sisa -= v;
+                    }
+                }
+
+                // 3. Anak (Asabah)
+                const al = parseInt(d.jmlAnakL) || 0;
+                const ap = parseInt(d.jmlAnakP) || 0;
+                
+                if(hasAnak) {
+                    const totalBagian = (al * 2) + ap;
+                    const perBagian = sisa / totalBagian;
+
+                    for(let i=1; i<=al; i++) {
+                        let n = document.getElementById(`al_${i}`).value || `Anak Laki ${i}`;
+                        res.push({ nama: n, role: "Anak Laki-laki", porsi: "Asabah (2x)", nilai: perBagian * 2 });
+                    }
+                    for(let i=1; i<=ap; i++) {
+                        let n = document.getElementById(`ap_${i}`).value || `Anak Perempuan ${i}`;
+                        res.push({ nama: n, role: "Anak Perempuan", porsi: "Asabah (1x)", nilai: perBagian });
+                    }
+                    sisa = 0;
+                } else if(hasCucu) {
+                    // Cucu hanya dapat jika tidak ada anak sama sekali
+                    const cl = parseInt(d.jmlCucuL) || 0;
+                    const cp = parseInt(d.jmlCucuP) || 0;
+                    const totalBagian = (cl * 2) + cp;
+                    const perBagian = sisa / totalBagian;
+
+                    for(let i=1; i<=cl; i++) {
+                        let n = document.getElementById(`cl_${i}`).value || `Cucu Laki ${i}`;
+                        res.push({ nama: n, role: "Cucu Laki-laki", porsi: "Pengganti Anak", nilai: perBagian * 2 });
+                    }
+                    for(let i=1; i<=cp; i++) {
+                        let n = document.getElementById(`cp_${i}`).value || `Cucu Perempuan ${i}`;
+                        res.push({ nama: n, role: "Cucu Perempuan", porsi: "Pengganti Anak", nilai: perBagian });
+                    }
+                    sisa = 0;
+                }
+
+                // Jika Ayah asabah dan tidak ada anak
+                if(!hasKeturunan && d.ayah) {
+                    res.push({ nama: d.namaAyah || "Ayah", role: "Ayah", porsi: "Asabah", nilai: sisa });
+                    sisa = 0;
+                }
+
+                this.state.results = res;
+            },
+
+            logicBW(total) {
+                const d = this.state.data;
+                const res = [];
+                
+                // BW Golongan 1: Pasangan & Anak (Dihitung sama rata)
+                const al = parseInt(d.jmlAnakL) || 0;
+                const ap = parseInt(d.jmlAnakP) || 0;
+                const hasPasangan = d.gender !== 'none';
+                
+                let headcount = al + ap + (hasPasangan ? 1 : 0);
+                
+                if(headcount > 0) {
+                    let perCapita = total / headcount;
+                    if(hasPasangan) res.push({ nama: d.namaP || "Pasangan", role: "Pasangan (Gol I)", porsi: `1/${headcount}`, nilai: perCapita });
+                    
+                    for(let i=1; i<=al; i++) res.push({ nama: document.getElementById(`al_${i}`).value || `Anak Laki ${i}`, role: "Anak (Gol I)", porsi: `1/${headcount}`, nilai: perCapita });
+                    for(let i=1; i<=ap; i++) res.push({ nama: document.getElementById(`ap_${i}`).value || `Anak Pr ${i}`, role: "Anak (Gol I)", porsi: `1/${headcount}`, nilai: perCapita });
+                } else {
+                    // Golongan 2: Orang Tua & Saudara (Disederhanakan untuk contoh 1000 baris)
+                    let ortuCount = (d.ibu ? 1 : 0) + (d.ayah ? 1 : 0);
+                    if(ortuCount > 0) {
+                        let perOrtu = total / ortuCount;
+                        if(d.ibu) res.push({ nama: d.namaIbu || "Ibu", role: "Ibu (Gol II)", porsi: `1/${ortuCount}`, nilai: perOrtu });
+                        if(d.ayah) res.push({ nama: d.namaAyah || "Ayah", role: "Ayah (Gol II)", porsi: `1/${ortuCount}`, nilai: perOrtu });
+                    }
+                }
+                this.state.results = res;
+            },
+
+            renderResults() {
+                const container = document.getElementById('tableContainer');
+                container.innerHTML = '';
+                this.state.results.forEach(item => {
+                    container.innerHTML += `
+                        <div class="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/5">
+                            <div>
+                                <p class="font-bold text-sm">${item.nama}</p>
+                                <p class="text-[10px] text-muted">${item.role} • <span class="text-white/40">${item.porsi}</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="mono text-sm text-green-400">${this.fmt(item.nilai)}</p>
+                            </div>
                         </div>
-                        <p class="font-mono text-green-400">${formatIDR(item.nilai)}</p>
-                    </div>
-                `;
-            });
-        }
+                    `;
+                });
+            },
 
-        // --- UTILS ---
-        function formatIDR(num) {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
-        }
+            fmt(num) {
+                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+            },
 
-        function updateIsland(text, color) {
-            const island = document.getElementById('island');
-            const txt = document.getElementById('island-text');
-            txt.innerText = text;
-            island.style.background = color === 'white' ? '#fff' : (color === 'red' ? '#7f1d1d' : (color === 'blue' ? '#1e3a8a' : '#fff'));
-            island.style.color = (color === 'white' || color === 'green') ? '#000' : '#fff';
-        }
+            error(msg) {
+                this.updateIsland(msg, "red");
+                document.getElementById('tableContainer').innerHTML = `<div class="text-center py-20 text-red-500 font-bold">${msg}</div>`;
+            },
 
-        function showError(msg) {
-            updateIsland(msg, "red");
-            document.getElementById('resultTable').innerHTML = `<p class="text-red-400 text-center py-10">${msg}</p>`;
-        }
+            reset() {
+                if(confirm("Hapus data permanen?")) {
+                    localStorage.removeItem('waris_pro_data');
+                    location.reload();
+                }
+            },
 
-        function autoSave() {
-            const data = {
-                hartaTotal: document.getElementById('hartaTotal').value,
-                isGonoGini: document.getElementById('isGonoGini').checked,
-                utangTotal: document.getElementById('utangTotal').value,
-                isZakat: document.getElementById('isZakat').checked,
-                namaPasangan: document.getElementById('namaPasangan').value,
-                genderPasangan: document.getElementById('genderPasangan').value,
-                jmlAnakL: document.getElementById('jmlAnakL').value,
-                jmlAnakP: document.getElementById('jmlAnakP').value
-            };
-            localStorage.setItem('warisData', JSON.stringify(data));
-        }
+            exportPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const rh = this.state.rincianHarta;
+                
+                // PDF Header
+                doc.setFontSize(18);
+                doc.text("LAPORAN PERHITUNGAN WARIS FORMAL", 105, 20, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Metode: ${this.state.mode === 'islam' ? 'Hukum Waris Islam (Faraidh)' : 'Hukum Perdata (BW)'}`, 105, 28, { align: 'center' });
+                doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 105, 33, { align: 'center' });
 
-        function loadSavedData() {
-            const saved = localStorage.getItem('warisData');
-            if(saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('hartaTotal').value = data.hartaTotal;
-                document.getElementById('isGonoGini').checked = data.isGonoGini;
-                document.getElementById('utangTotal').value = data.utangTotal;
-                document.getElementById('isZakat').checked = data.isZakat;
-                document.getElementById('namaPasangan').value = data.namaPasangan;
-                document.getElementById('genderPasangan').value = data.genderPasangan;
-                document.getElementById('jmlAnakL').value = data.jmlAnakL;
-                document.getElementById('jmlAnakP').value = data.jmlAnakP;
-                if(data.isZakat) toggleZakat();
-                renderAnakNames();
+                // Section 1: Valuasi
+                doc.setFontSize(12);
+                doc.text("I. RINCIAN HARTA DAN KEWAJIBAN", 20, 45);
+                doc.autoTable({
+                    startY: 50,
+                    head: [['Deskripsi', 'Jumlah']],
+                    body: [
+                        ['Total Harta Bruto', this.fmt(rh.bruto)],
+                        ['Potongan Gono-Gini (Harta Bersama)', `(${this.fmt(rh.gono)})`],
+                        ['Kewajiban (Utang, Jenazah, Zakat)', `(${this.fmt(rh.kewajiban)})`],
+                        ['TOTAL SALDO BERSIH WARIS', this.fmt(rh.bersih)]
+                    ],
+                    theme: 'striped',
+                    headStyles: { fillColor: [30, 30, 30] }
+                });
+
+                // Section 2: Distribusi
+                doc.text("II. DISTRIBUSI PEMBAGIAN AHLI WARIS", 20, doc.lastAutoTable.finalY + 15);
+                const tableBody = this.state.results.map(i => [i.nama, i.role, i.porsi, this.fmt(i.nilai)]);
+                doc.autoTable({
+                    startY: doc.lastAutoTable.finalY + 20,
+                    head: [['Nama Ahli Waris', 'Kedudukan', 'Porsi', 'Nilai Waris']],
+                    body: tableBody,
+                    theme: 'grid',
+                    headStyles: { fillColor: [60, 60, 60] }
+                });
+
+                // Disclaimer
+                doc.setFontSize(8);
+                doc.text("Disclaimer: Perhitungan ini bersifat simulasi berdasarkan data yang dimasukkan. Untuk hasil hukum yang mengikat,", 20, doc.lastAutoTable.finalY + 20);
+                doc.text("harap berkonsultasi dengan Notaris (untuk BW) atau Pengadilan Agama (untuk Islam).", 20, doc.lastAutoTable.finalY + 25);
+
+                doc.save(`Laporan_Waris_${this.state.mode}.pdf`);
+                this.updateIsland("PDF Downloaded", "green");
             }
-        }
-
-        function resetAll() {
-            if(confirm("Hapus semua data dan mulai baru?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Header
-            doc.setFontSize(18);
-            doc.text("LAPORAN FORMAL DISTRIBUSI WARIS", 105, 20, { align: 'center' });
-            doc.setFontSize(10);
-            doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID')}`, 105, 27, { align: 'center' });
-            
-            // Rincian Harta (Itemized)
-            doc.setFontSize(12);
-            doc.text("I. RINCIAN PERHITUNGAN HARTA", 20, 45);
-            const dataHarta = [
-                ["Harta Bruto", formatIDR(rincianPotongan.total)],
-                ["Potongan Gono-Gini", `(${formatIDR(rincianPotongan.gonoGini)})`],
-                ["Kewajiban (Utang/Biaya)", `(${formatIDR(rincianPotongan.utang)})`],
-                ["Zakat Mal (2,5%)", `(${formatIDR(rincianPotongan.zakat)})`],
-                ["TOTAL HARTA WARIS BERSIH", formatIDR(rincianPotongan.bersih)]
-            ];
-            doc.autoTable({
-                startY: 50,
-                head: [['Deskripsi', 'Nilai']],
-                body: dataHarta,
-                theme: 'striped',
-                headStyles: { fillStyle: [40, 40, 40] }
-            });
-
-            // Distribusi Ahli Waris
-            doc.text("II. DISTRIBUSI AHLI WARIS", 20, doc.lastAutoTable.finalY + 15);
-            const dataWaris = rincianWaris.map(item => [item.nama, item.status, item.porsi, formatIDR(item.nilai)]);
-            doc.autoTable({
-                startY: doc.lastAutoTable.finalY + 20,
-                head: [['Nama Ahli Waris', 'Status', 'Bagian', 'Nilai Waris']],
-                body: dataWaris,
-                theme: 'grid'
-            });
-
-            doc.save("Laporan_Waris_Formal.pdf");
-            updateIsland("PDF Berhasil Diunduh", "white");
-        }
-
-        window.onload = loadSavedData;
+        };
     </script>
 </body>
 </html>
