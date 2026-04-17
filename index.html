@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 DAFTAR AHLI WARIS</h3>
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 GOLONGAN I & II (UTAMA)</h3>
                     <div class="space-y-4">
                         <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
                             <option value="none">Pilih Pasangan</option>
@@ -95,6 +95,24 @@
                         <div class="grid grid-cols-2 gap-3">
                             <input type="number" id="sl" class="input-dark" placeholder="Sdr Laki-laki" oninput="AdienFinal.calculate()">
                             <input type="number" id="sp" class="input-dark" placeholder="Sdr Perempuan" oninput="AdienFinal.calculate()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 bg-slate-800/20">
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 text-blue-400">🧬 GOLONGAN III & IV (LANJUTAN)</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                <input type="checkbox" id="hasKakek" onchange="AdienFinal.calculate()"> Ada Kakek
+                            </label>
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                <input type="checkbox" id="hasNenek" onchange="AdienFinal.calculate()"> Ada Nenek
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="paman" class="input-dark" placeholder="Jml Paman" oninput="AdienFinal.calculate()">
+                            <input type="number" id="tante" class="input-dark" placeholder="Jml Tante" oninput="AdienFinal.calculate()">
                         </div>
                     </div>
                 </div>
@@ -171,9 +189,12 @@
                 let res = [], pool = netto;
                 const gP = document.getElementById('genderP').value;
                 const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
+                const pmn = this.num('paman'), tnt = this.num('tante');
                 const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
+                const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
                 const hasAnak = (al + ap) > 0;
 
+                // FARAIDH
                 if (gP !== 'none') {
                     let f = hasAnak ? (gP === 'istri' ? 1/8 : 1/4) : (gP === 'istri' ? 1/4 : 1/2);
                     let v = Math.round(netto * f); res.push({ n: gP.toUpperCase(), r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
@@ -186,6 +207,7 @@
                     let v = Math.round(netto * 1/6); res.push({ n: 'AYAH', r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
                 }
 
+                // ASHOBAH
                 if (pool > 0) {
                     if (hasAnak) {
                         let ratio = pool / (al * 2 + ap);
@@ -202,10 +224,12 @@
                     }
                 }
 
-                // Zero State for Islam (Hijab)
-                if ((sl+sp > 0) && (hasAnak || hA)) {
-                    if (!res.some(x => x.n.includes('SDR'))) res.push({ n: 'SAUDARA/I', r: 'Hijab Hirman (Tertutup)', v: 0, count: (sl+sp) });
-                }
+                // HIJAB DISPLAY (Untuk yang diinput tapi 0)
+                if (hK && !res.some(x => x.n === 'KAKEK')) res.push({ n: 'KAKEK', r: 'Hijab Hirman', v: 0, count: 1 });
+                if (hN && !res.some(x => x.n === 'NENEK')) res.push({ n: 'NENEK', r: 'Hijab Hirman', v: 0, count: 1 });
+                if (sl+sp > 0 && !res.some(x => x.n.includes('SDR'))) res.push({ n: 'SAUDARA/I', r: 'Hijab Hirman', v: 0, count: (sl+sp) });
+                if (pmn+tnt > 0) res.push({ n: 'PAMAN/TANTE', r: 'Hijab Hirman', v: 0, count: (pmn+tnt) });
+
                 this.state.results = res;
             },
 
@@ -213,14 +237,28 @@
                 let res = [];
                 const al = this.num('al'), ap = this.num('ap'), gP = document.getElementById('genderP').value !== 'none';
                 const sl = this.num('sl'), sp = this.num('sp'), hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
-                
+                const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
+                const pmn = this.num('paman'), tnt = this.num('tante');
+
                 if (al + ap + gP > 0) {
                     const c = al + ap + (gP ? 1 : 0);
-                    res.push({ n: 'GOLONGAN I', r: 'Ahli Waris Prioritas', v: netto, count: c });
-                    if (sl+sp+hI+hA > 0) res.push({ n: 'GOLONGAN II', r: 'Tertutup Prinsip Derajat', v: 0, count: (sl+sp+(hI?1:0)+(hA?1:0)) });
+                    res.push({ n: 'GOLONGAN I', r: 'Ahli Waris Utama', v: netto, count: c });
+                    // Tampilkan yang tertutup
+                    if (sl+sp+hI+hA > 0) res.push({ n: 'GOLONGAN II', r: 'Tertutup Gol. I', v: 0, count: (sl+sp+(hI?1:0)+(hA?1:0)) });
+                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Gol. I', v: 0, count: (hK?1:0)+(hN?1:0) });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Gol. I', v: 0, count: pmn+tnt });
                 } else if (sl + sp + hI + hA > 0) {
                     const c = sl + sp + (hI ? 1 : 0) + (hA ? 1 : 0);
-                    res.push({ n: 'GOLONGAN II', r: 'Ahli Waris Prioritas', v: netto, count: c });
+                    res.push({ n: 'GOLONGAN II', r: 'Ahli Waris Utama', v: netto, count: c });
+                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Gol. II', v: 0, count: (hK?1:0)+(hN?1:0) });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Gol. II', v: 0, count: pmn+tnt });
+                } else if (hK || hN) {
+                    const c = (hK?1:0)+(hN?1:0);
+                    res.push({ n: 'GOLONGAN III', r: 'Ahli Waris Utama', v: netto, count: c });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Gol. III', v: 0, count: pmn+tnt });
+                } else if (pmn + tnt > 0) {
+                    const c = pmn + tnt;
+                    res.push({ n: 'GOLONGAN IV', r: 'Ahli Waris Utama', v: netto, count: c });
                 }
                 this.state.results = res;
             },
@@ -231,7 +269,7 @@
                     const pk = r.v > 0 ? Math.round(r.v / r.count) : 0;
                     const isZero = r.v === 0;
                     box.innerHTML += `
-                    <div class="p-5 rounded-2xl flex justify-between items-center res-item ${isZero ? 'gol-zero' : (r.r.includes('Faraidh') || r.r.includes('Prioritas') ? 'gol-prio' : 'gol-ashaba')}">
+                    <div class="p-5 rounded-2xl flex justify-between items-center res-item ${isZero ? 'gol-zero' : (r.r.includes('Utama') || r.r.includes('Faraidh') ? 'gol-prio' : 'gol-ashaba')}">
                         <div>
                             <p class="font-black text-sm ${isZero ? 'text-slate-500' : 'text-white'}">${r.n} <span class="text-blue-500 text-[10px] ml-1">x${r.count}</span></p>
                             <p class="text-[9px] font-bold text-slate-500 uppercase mt-1">Status: ${r.r}</p>
