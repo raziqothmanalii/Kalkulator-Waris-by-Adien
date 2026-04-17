@@ -187,9 +187,12 @@
                 this.state.mode === 'islam' ? this.logicIslam(sisa) : this.logicBW(sisa);
                 
                 const disc = document.getElementById('disclaimer');
-                disc.innerHTML = this.state.mode === 'islam' ? 
-                    `📢 <span class="text-blue-400">INFO:</span> Nominal Merah (Rp 0) menandakan Ahli Waris terhijab (Tertutup) sesuai Kompilasi Hukum Islam.` :
-                    `📢 <span class="text-blue-400">INFO:</span> Nominal Merah (Rp 0) menandakan Ahli Waris tidak mendapatkan bagian karena sistem derajat prioritas golongan KUH Perdata.`;
+                const infoText = this.state.mode === 'islam' ? 
+                    `Nominal Merah (Rp 0) menandakan Ahli Waris terhijab (Tertutup) sesuai Kompilasi Hukum Islam.` :
+                    `Nominal Merah (Rp 0) menandakan Ahli Waris tidak mendapatkan bagian karena sistem derajat prioritas golongan KUH Perdata.`;
+                
+                disc.innerHTML = `📢 <span class="text-blue-400">INFO:</span> ${infoText}<br><br>
+                                  ⚠️ <span class="text-blue-400">PENTING:</span> KALKULATOR INI HANYA ALAT BANTU DAN BERSIFAT SIMULASI. KAMI TETAP MEREKOMENDASIKAN BERDISKUSI DENGAN AHLI WARIS, NOTARIS, ATAU TOKOH AGAMA UNTUK KEPUTUSAN FINAL.`;
                 
                 this.display();
             },
