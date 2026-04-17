@@ -25,6 +25,11 @@
         .gol-ashaba { border-left-color: #f59e0b; } 
         .gol-zero { border-left-color: #ef4444; opacity: 0.6; }
         #welcomeOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        
+        /* Tooltip Style */
+        .tooltip { position: relative; display: inline-block; cursor: help; }
+        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 8px; padding: 10px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; border: 1px solid #334155; font-size: 10px; font-weight: normal; line-height: 1.4; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="dark">
@@ -35,7 +40,7 @@
             <h2 class="text-2xl font-black mb-4 tracking-tight text-white">Kalkulator Waris by Adien</h2>
             <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 mb-6 text-left">
                 <p class="text-xs text-blue-100 leading-relaxed">
-                    Website ini dirancang untuk menghitung estimasi pembagian waris Anda secara akurat dengan sistem tarif progresif sesuai kaidah Hukum Islam & KUH Perdata (BW). Jika Anda menemukan bug atau error, silakan hubungi saya di: <br>
+                    Website ini dirancang untuk menghitung estimasi pembagian waris Anda secara akurat sesuai kaidah Hukum Islam & KUH Perdata (BW). Jika Anda menemukan bug atau error, silakan hubungi saya di: <br>
                     <span class="font-bold text-blue-400">raziqothmanalii@gmail.com</span>
                 </p>
             </div>
@@ -63,7 +68,12 @@
                         </div>
                         <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="isGono" onchange="AdienFinal.calculate()"> Gono-Gini
+                                <input type="checkbox" id="isGono" onchange="AdienFinal.calculate()"> 
+                                Gono-Gini 
+                                <span class="tooltip ml-1 text-blue-400 underline italic">
+                                    (?)
+                                    <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
+                                </span>
                             </label>
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
@@ -194,7 +204,6 @@
                 const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
                 const hasAnak = (al + ap) > 0;
 
-                // FARAIDH
                 if (gP !== 'none') {
                     let f = hasAnak ? (gP === 'istri' ? 1/8 : 1/4) : (gP === 'istri' ? 1/4 : 1/2);
                     let v = Math.round(netto * f); res.push({ n: gP.toUpperCase(), r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
@@ -207,7 +216,6 @@
                     let v = Math.round(netto * 1/6); res.push({ n: 'AYAH', r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
                 }
 
-                // ASHOBAH
                 if (pool > 0) {
                     if (hasAnak) {
                         let ratio = pool / (al * 2 + ap);
@@ -224,7 +232,6 @@
                     }
                 }
 
-                // HIJAB DISPLAY (Untuk yang diinput tapi 0)
                 if (hK && !res.some(x => x.n === 'KAKEK')) res.push({ n: 'KAKEK', r: 'Hijab Hirman', v: 0, count: 1 });
                 if (hN && !res.some(x => x.n === 'NENEK')) res.push({ n: 'NENEK', r: 'Hijab Hirman', v: 0, count: 1 });
                 if (sl+sp > 0 && !res.some(x => x.n.includes('SDR'))) res.push({ n: 'SAUDARA/I', r: 'Hijab Hirman', v: 0, count: (sl+sp) });
@@ -243,19 +250,18 @@
                 if (al + ap + gP > 0) {
                     const c = al + ap + (gP ? 1 : 0);
                     res.push({ n: 'GOLONGAN I', r: 'Ahli Waris Utama', v: netto, count: c });
-                    // Tampilkan yang tertutup
-                    if (sl+sp+hI+hA > 0) res.push({ n: 'GOLONGAN II', r: 'Tertutup Gol. I', v: 0, count: (sl+sp+(hI?1:0)+(hA?1:0)) });
-                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Gol. I', v: 0, count: (hK?1:0)+(hN?1:0) });
-                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Gol. I', v: 0, count: pmn+tnt });
+                    if (sl+sp+hI+hA > 0) res.push({ n: 'GOLONGAN II', r: 'Tertutup Prinsip Derajat', v: 0, count: (sl+sp+(hI?1:0)+(hA?1:0)) });
+                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Prinsip Derajat', v: 0, count: (hK?1:0)+(hN?1:0) });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Prinsip Derajat', v: 0, count: pmn+tnt });
                 } else if (sl + sp + hI + hA > 0) {
                     const c = sl + sp + (hI ? 1 : 0) + (hA ? 1 : 0);
                     res.push({ n: 'GOLONGAN II', r: 'Ahli Waris Utama', v: netto, count: c });
-                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Gol. II', v: 0, count: (hK?1:0)+(hN?1:0) });
-                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Gol. II', v: 0, count: pmn+tnt });
+                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Prinsip Derajat', v: 0, count: (hK?1:0)+(hN?1:0) });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Prinsip Derajat', v: 0, count: pmn+tnt });
                 } else if (hK || hN) {
                     const c = (hK?1:0)+(hN?1:0);
                     res.push({ n: 'GOLONGAN III', r: 'Ahli Waris Utama', v: netto, count: c });
-                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Gol. III', v: 0, count: pmn+tnt });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Prinsip Derajat', v: 0, count: pmn+tnt });
                 } else if (pmn + tnt > 0) {
                     const c = pmn + tnt;
                     res.push({ n: 'GOLONGAN IV', r: 'Ahli Waris Utama', v: netto, count: c });
