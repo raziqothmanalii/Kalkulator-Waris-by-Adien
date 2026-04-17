@@ -66,12 +66,14 @@
                         </div>
                         <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
-                                Harta Bersama 
-                                <span class="tooltip ml-1 text-blue-400"> (?)
-                                    <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
-                                </span>
-                            </label>
+                                <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                    <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
+                                    Harta Bersama 
+                                    <span class="tooltip ml-1 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px]">
+                                        ?
+                                        <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
+                                    </span>
+                                </label>
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
                             </label>
