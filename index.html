@@ -26,7 +26,6 @@
         .gol-zero { border-left-color: #ef4444; opacity: 0.6; }
         #welcomeOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px; }
         
-        /* Tooltip Style */
         .tooltip { position: relative; display: inline-block; cursor: help; }
         .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 8px; padding: 10px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; border: 1px solid #334155; font-size: 10px; font-weight: normal; line-height: 1.4; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
@@ -68,8 +67,8 @@
                         </div>
                         <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="isGono" onchange="AdienFinal.calculate()"> 
-                                Gono-Gini 
+                                <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
+                                Harta Bersama 
                                 <span class="tooltip ml-1 text-blue-400 underline italic">
                                     (?)
                                     <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
@@ -83,7 +82,7 @@
                 </div>
 
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 GOLONGAN I & II (UTAMA)</h3>
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 KELUARGA INTI</h3>
                     <div class="space-y-4">
                         <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
                             <option value="none">Pilih Pasangan</option>
@@ -110,7 +109,7 @@
                 </div>
 
                 <div class="glass-card p-8 bg-slate-800/20">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 text-blue-400">🧬 GOLONGAN III & IV (LANJUTAN)</h3>
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 text-blue-400">🧬 KELUARGA LAINNYA</h3>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-3">
                             <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
@@ -179,8 +178,8 @@
 
             calculate() {
                 const bruto = this.val('hartaRaw');
-                const gono = document.getElementById('isGono').checked ? Math.round(bruto * 0.5) : 0;
-                let sisa = bruto - gono - this.val('utangRaw') - this.val('biayaRaw');
+                const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
+                let sisa = bruto - hBersama - this.val('utangRaw') - this.val('biayaRaw');
                 let zakat = (document.getElementById('isZakat').checked && sisa >= 85000000) ? Math.round(sisa * 0.025) : 0;
                 sisa -= zakat;
 
