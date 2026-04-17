@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Waris V5.2 - Official Production</title>
+    <title>Kalkulator Waris by Adien - Beta Testing</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -35,7 +35,7 @@
     <div id="welcomeOverlay">
         <div class="bg-white max-w-lg w-full rounded-[32px] p-8 md:p-12 text-center shadow-2xl animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">🏛️</div>
-            <h2 class="text-2xl font-black mb-4 tracking-tight">Kalkulator Waris Ultra V5.2</h2>
+            <h2 class="text-2xl font-black mb-4 tracking-tight">Kalkulator Waris by Adien</h2>
             
             <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 mb-6 text-left">
                 <p class="text-[10px] font-black text-amber-600 uppercase mb-1 tracking-widest">⚠️ Tahap Pengembangan (BETA)</p>
@@ -50,9 +50,9 @@
 
     <header class="bg-white border-b border-slate-100 py-6 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <h1 class="text-2xl font-black tracking-tighter">UltraWaris <span class="text-blue-600">V5.2</span></h1>
+            <h1 class="text-2xl font-black tracking-tighter">Kalkulator Waris<span class="text-blue-600">by Adien</span></h1>
             <div class="flex items-center gap-4">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border px-3 py-1 rounded-full">OFFICIAL PRODUCTION</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border px-3 py-1 rounded-full">BETA TESTING</span>
             </div>
         </div>
     </header>
@@ -301,7 +301,7 @@
                 doc.setFontSize(22); 
                 // FIX FINAL: Penulisan syntax yang benar
                 doc.setFont(undefined, 'bold'); 
-                doc.text('LAPORAN WARIS ULTRA V5.2 OFFICIAL', 105, 20, { align: 'center' });
+                doc.text('LAPORAN KALKULATOR WARIS BY ADIEN BETA', 105, 20, { align: 'center' });
                 
                 doc.autoTable({
                     startY: 35, theme: 'grid', headStyles: { fillColor: [37, 99, 235] },
@@ -322,7 +322,7 @@
                 const dis = doc.splitTextToSize('Disclaimer: Perhitungan ini bersifat simulasi awal. Disarankan berdiskusi dengan Ahli Waris, Notaris, atau ahli hukum/agama setempat.', 180);
                 doc.text(dis, 14, doc.lastAutoTable.finalY + 20);
 
-                doc.save(`Waris_V52_Official_${Date.now()}.pdf`);
+                doc.save(`Waris_BETA_${Date.now()}.pdf`);
             }
         };
 
