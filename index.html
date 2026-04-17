@@ -1,0 +1,406 @@
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Waris by Adien</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505; --card: #111113; --accent: #6366f1; --perdata: #3b82f6; 
+            --islam: #10b981; --gold: #f59e0b; --text: #f8fafc; --text-dim: #94a3b8; --border: #262626;
+            --danger: #ef4444; --card-inner: #0a0a0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+        /* PRINT STYLES */
+        @media print {
+            body { overflow: visible !important; background: white !important; color: black !important; }
+            .app-container, #welcomeOverlay, .island-container { display: none !important; }
+            #printReport { display: block !important; padding: 40px; color: black !important; }
+            .print-card { border-bottom: 1px solid #ccc; padding: 10px 0; page-break-inside: avoid; }
+            .no-print { display: none !important; }
+        }
+        #printReport { display: none; background: white; width: 100%; }
+
+        /* WELCOME OVERLAY */
+        #welcomeOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(25px);
+            z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 0.6s;
+        }
+        .modal {
+            background: var(--card); border: 1px solid var(--border); padding: 60px;
+            border-radius: 50px; max-width: 750px; text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,0.9);
+        }
+
+        /* DYNAMIC ISLAND */
+        .island-container { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 500; }
+        .island { 
+            background: #000; color: white; border-radius: 100px; padding: 10px 35px; 
+            min-width: 280px; height: 45px; display: flex; align-items: center; justify-content: center; 
+            font-size: 11px; font-weight: 800; border: 1px solid var(--border); transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .island.active { background: var(--accent); width: 520px; letter-spacing: 2px; box-shadow: 0 0 30px rgba(99,102,241,0.5); }
+
+        /* APP LAYOUT */
+        .app-container { display: grid; grid-template-columns: 1.1fr 0.9fr; width: 98vw; height: 95vh; background: var(--card); border: 1px solid var(--border); border-radius: 40px; overflow: hidden; position: relative; }
+        .sidebar { padding: 40px; overflow-y: auto; border-right: 1px solid var(--border); scrollbar-width: none; background: linear-gradient(180deg, #111113 0%, #050505 100%); }
+        .main-view { padding: 40px; display: flex; flex-direction: column; height: 100%; position: relative; }
+
+        /* TABS */
+        .tab-wrapper { display: flex; background: #000; padding: 8px; border-radius: 25px; margin-bottom: 30px; border: 1px solid var(--border); }
+        .tab-trigger { flex: 1; padding: 15px; border: none; background: none; color: var(--text-dim); font-weight: 800; cursor: pointer; border-radius: 18px; font-size: 11px; transition: 0.4s; text-transform: uppercase; letter-spacing: 1px; }
+        .tab-trigger.active.p-mode { background: var(--perdata); color: white; }
+        .tab-trigger.active.i-mode { background: var(--islam); color: white; }
+
+        /* INPUTS */
+        .group-card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 25px; padding: 22px; margin-bottom: 18px; transition: 0.4s; }
+        .group-card:hover { border-color: #444; }
+        .label-row { font-size: 10px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .q-btn { background: #262626; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; border: none; }
+        
+        .sub-input-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); display: none; animation: slideDown 0.3s ease; }
+        .explanation { display: none; background: #1a1a1c; border-left: 4px solid var(--accent); padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+
+        input { width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--border); color: white; font-size: 18px; padding: 8px 0; outline: none; transition: 0.3s; font-weight: 600; }
+        input:focus { border-bottom-color: var(--accent); }
+        input[type="number"] { -moz-appearance: textfield; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        /* RESULTS AREA */
+        .result-scroll { flex: 1; overflow-y: auto; padding-right: 15px; margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .person-card { background: #000; border: 1px solid var(--border); padding: 20px; border-radius: 22px; border-left: 6px solid transparent; transition: 0.3s; flex-shrink: 0; }
+        .person-card.active { border-left-color: var(--gold); }
+        .person-card.hijab { border-left-color: var(--danger); opacity: 0.5; }
+        .person-card.meta { border-left-color: var(--accent); background: rgba(99,102,241,0.05); }
+
+        .btn-action { background: #fff; color: #000; border: none; padding: 20px; border-radius: 100px; font-weight: 900; cursor: pointer; font-size: 14px; letter-spacing: 1.5px; transition: 0.4s; margin-top: 15px; }
+        .btn-action:hover { background: var(--accent); color: white; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(99,102,241,0.3); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 15px; border-radius: 100px; font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.3s; }
+        .btn-outline:hover { border-color: var(--text); color: white; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="welcomeOverlay">
+        <div class="modal">
+            <h1 style="font-size: 48px; font-weight: 900; margin-bottom: 10px;">Kalkulator Waris <br><span style="color:var(--accent)">by Adien</span></h1>
+            <div style="background: var(--accent); color: white; display: inline-block; padding: 5px 18px; border-radius: 8px; font-size: 10px; font-weight: 900; margin-bottom: 25px; letter-spacing: 2px;">ROBUST LEGAL ENGINE V5.0</div>
+            <p style="font-size: 14px; color: var(--text-dim); line-height: 1.8; margin-bottom: 30px; max-width: 550px; margin-inline: auto;">
+                Sistem pakar waris dengan logika berlapis untuk kasus <b>Ahli Waris Pengganti (Cucu)</b>, <b>Gharawain</b>, dan <b>Legitieme Portie</b>. Akurasi tinggi dengan pemisahan total hukum Islam & Perdata.
+            </p>
+            <button class="btn-action" style="width: 250px;" onclick="closeWelcome()">MULAI ANALISA</button>
+        </div>
+    </div>
+
+    <div class="island-container"><div class="island" id="island">INITIALIZING ENGINE...</div></div>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="tab-wrapper">
+                <button id="tabP" class="tab-trigger active p-mode" onclick="setMode('perdata')">Hukum Perdata (BW)</button>
+                <button id="tabI" class="tab-trigger i-mode" onclick="setMode('islam')">Hukum Islam (KHI)</button>
+            </div>
+
+            <div class="group-card" style="border-color: var(--accent);">
+                <div class="label-row"><span id="lblHarta">Harta Waris (Al-Tirkah)</span> <button class="q-btn" onclick="toggleHelp('tipHarta')">?</button></div>
+                <div class="explanation" id="tipHarta">Harta bersih setelah dikurangi hutang, biaya jenazah, dan zakat (Islam) atau pajak peninggalan (Perdata).</div>
+                <input type="text" id="dispHarta" placeholder="Rp 0" oninput="formatMoney(this)">
+                <input type="hidden" id="rawHarta">
+            </div>
+
+            <div class="group-card">
+                <div class="label-row"><span id="lblPasangan">Suami / Istri</span> <button class="q-btn" onclick="toggleHelp('tipPasangan')">?</button></div>
+                <div class="explanation" id="tipPasangan">Islam: Suami (1/2 atau 1/4), Istri (1/4 atau 1/8). Perdata: Berbagi rata dengan anak di Golongan I.</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><label style="font-size: 8px; color: var(--text-dim);">JUMLAH SUAMI</label><input type="number" id="vSuami" value="0"></div>
+                    <div><label style="font-size: 8px; color: var(--text-dim);">JUMLAH ISTRI</label><input type="number" id="vIstri" value="0"></div>
+                </div>
+            </div>
+
+            <div class="group-card">
+                <div class="label-row"><span id="lblKeturunan">Keturunan Langsung</span> <button class="q-btn" onclick="toggleHelp('tipAnak')">?</button></div>
+                <div class="explanation" id="tipAnak">Anak kandung pewaris. Jika ada anak yang meninggal lebih dulu, masukkan jumlahnya di bawah untuk mengaktifkan sistem Ahli Waris Pengganti (Cucu).</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><label id="lblAL" style="font-size: 8px; color: var(--text-dim);">ANAK LAKI-LAKI</label><input type="number" id="vAL" value="0" onchange="checkCucu()"></div>
+                    <div id="boxAP"><label style="font-size: 8px; color: var(--text-dim);">ANAK PEREMPUAN</label><input type="number" id="vAP" value="0" onchange="checkCucu()"></div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <label style="font-size: 8px; color: var(--gold); letter-spacing: 1px;">ANAK YANG MENINGGAL LEBIH DULU?</label>
+                    <input type="number" id="vAnakMeninggal" value="0" onchange="toggleCucuInput()" style="border-bottom-color: var(--gold);">
+                </div>
+                <div id="cucuInputArea" class="sub-input-box">
+                    <label style="font-size: 8px; color: var(--text-dim);">TOTAL CUCU (DARI ANAK YANG MENINGGAL)</label>
+                    <input type="number" id="vCucu" value="0" placeholder="0">
+                </div>
+            </div>
+
+            <div class="group-card">
+                <div class="label-row"><span id="lblOrtu">Orang Tua Kandung</span> <button class="q-btn" onclick="toggleHelp('tipOrtu')">?</button></div>
+                <div class="explanation" id="tipOrtu">Ayah/Ibu. Dalam Islam, mereka adalah Dzawil Furud (1/6 atau 1/3). Dalam BW, mereka adalah Golongan II (Min 1/4).</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><label style="font-size: 8px; color: var(--text-dim);">AYAH</label><input type="number" id="vAyah" value="0"></div>
+                    <div><label style="font-size: 8px; color: var(--text-dim);">IBU</label><input type="number" id="vIbu" value="0"></div>
+                </div>
+            </div>
+
+            <div class="group-card">
+                <div class="label-row"><span id="lblSaudara">Saudara Kandung</span> <button class="q-btn" onclick="toggleHelp('tipSdr')">?</button></div>
+                <div class="explanation" id="tipSdr">Saudara kandung. Dalam Islam, terhalang (Hijab) oleh Anak Laki-laki atau Ayah. Dalam BW, masuk Golongan II.</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><label style="font-size: 8px; color: var(--text-dim);">SDR LAKI-LAKI</label><input type="number" id="vSL" value="0"></div>
+                    <div><label style="font-size: 8px; color: var(--text-dim);">SDR PEREMPUAN</label><input type="number" id="vSP" value="0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-view">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                <h2 style="font-size: 26px; font-weight: 900;" id="modeTitle">Analisa Perdata</h2>
+                <button class="btn-outline" onclick="preparePrint()">CETAK / SIMPAN PDF</button>
+            </div>
+            <div class="result-scroll" id="outputArea">
+                <div style="text-align: center; margin-top: 200px; color: var(--text-dim); opacity: 0.5; font-size: 13px;">
+                    Belum ada data dianalisa.<br>Silakan isi data dan klik "PROSES PEMBAGIAN".
+                </div>
+            </div>
+            <button class="btn-action" onclick="runEngine()">PROSES PEMBAGIAN INDIVIDUAL</button>
+        </div>
+    </div>
+
+    <div id="printReport"></div>
+
+<script>
+    let currentMode = 'perdata';
+    const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+
+    function closeWelcome() { 
+        const over = document.getElementById('welcomeOverlay');
+        over.style.opacity = '0'; 
+        setTimeout(() => over.style.display = 'none', 600); 
+    }
+
+    function toggleHelp(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleCucuInput() {
+        const val = parseInt(document.getElementById('vAnakMeninggal').value) || 0;
+        document.getElementById('cucuInputArea').style.display = (val > 0) ? 'block' : 'none';
+    }
+
+    function formatMoney(e) {
+        let val = e.value.replace(/[^0-9]/g, '');
+        document.getElementById('rawHarta').value = val;
+        if (val) e.value = formatter.format(val);
+    }
+
+    function setMode(m) {
+        currentMode = m;
+        document.getElementById('tabP').className = 'tab-trigger' + (m==='perdata' ? ' active p-mode' : '');
+        document.getElementById('tabI').className = 'tab-trigger' + (m==='islam' ? ' active i-mode' : '');
+        
+        document.getElementById('modeTitle').innerText = m==='perdata' ? 'Analisa Perdata (BW)' : 'Analisa Islam (KHI)';
+        document.getElementById('modeTitle').style.color = m==='perdata' ? 'var(--perdata)' : 'var(--islam)';
+        
+        // Terminology Refresh
+        document.getElementById('lblHarta').innerText = m==='perdata' ? 'Harta Waris Siap Bagi' : 'Harta Waris (Al-Tirkah)';
+        document.getElementById('lblKeturunan').innerText = m==='perdata' ? 'Keturunan (Gol I)' : 'Keturunan (Furu\')';
+        document.getElementById('lblOrtu').innerText = m==='perdata' ? 'Orang Tua (Gol II)' : 'Orang Tua (Usul)';
+        document.getElementById('lblSaudara').innerText = m==='perdata' ? 'Saudara Kandung (Gol II)' : 'Saudara (Hawasyi)';
+        document.getElementById('boxAP').style.display = m==='perdata' ? 'none' : 'block';
+        document.getElementById('lblAL').innerText = m==='perdata' ? 'JUMLAH ANAK' : 'ANAK LAKI-LAKI';
+    }
+
+    // --- ENGINE CORE ---
+
+    function runEngine() {
+        const h = parseFloat(document.getElementById('rawHarta').value) || 0;
+        if(h <= 0) return alert("Masukkan harta waris terlebih dahulu.");
+
+        const island = document.getElementById('island');
+        island.classList.add('active');
+        island.innerText = "RUNNING LEGAL COMPUTATION...";
+
+        setTimeout(() => {
+            const state = {
+                h,
+                suami: parseInt(document.getElementById('vSuami').value) || 0,
+                istri: parseInt(document.getElementById('vIstri').value) || 0,
+                al: parseInt(document.getElementById('vAL').value) || 0,
+                ap: parseInt(document.getElementById('vAP').value) || 0,
+                am: parseInt(document.getElementById('vAnakMeninggal').value) || 0,
+                cucu: parseInt(document.getElementById('vCucu').value) || 0,
+                ay: parseInt(document.getElementById('vAyah').value) || 0,
+                ib: parseInt(document.getElementById('vIbu').value) || 0,
+                sl: parseInt(document.getElementById('vSL').value) || 0,
+                sp: parseInt(document.getElementById('vSP').value) || 0
+            };
+
+            const result = (currentMode === 'perdata') ? enginePerdata(state) : engineIslam(state);
+            renderResults(result);
+            island.classList.remove('active');
+            island.innerText = "ANALYSIS COMPLETE";
+        }, 800);
+    }
+
+    function enginePerdata(s) {
+        let list = [];
+        let h = s.h;
+
+        // GOLONGAN I (Pasangan + Anak + Anak Meninggal/Cucu)
+        if (s.al > 0 || s.suami > 0 || s.istri > 0 || s.am > 0) {
+            let totalKepala = (s.suami > 0 ? 1 : 0) + (s.istri > 0 ? 1 : 0) + s.al + s.am;
+            let jatahBase = h / totalKepala;
+
+            if(s.suami > 0) list.push({n: "Suami", v: jatahBase, d: "Ahli waris Gol I (Pasangan). Berbagi rata dengan anak sesuai Pasal 852 BW."});
+            if(s.istri > 0) list.push({n: "Istri", v: jatahBase, d: "Ahli waris Gol I (Pasangan). Berbagi rata dengan anak sesuai Pasal 852 BW."});
+            
+            for(let i=1; i<=s.al; i++) {
+                list.push({n: `Anak ${i}`, v: jatahBase, d: "Keturunan derajat pertama. Memiliki hak mutlak (Legitieme Portie)."});
+            }
+
+            // Cucu sebagai Pengganti
+            if(s.am > 0 && s.cucu > 0) {
+                let jatahPerCucu = (jatahBase * s.am) / s.cucu;
+                for(let i=1; i<=s.cucu; i++) {
+                    list.push({n: `Cucu ${i} (Ahli Waris Pengganti)`, v: jatahPerCucu, d: "Menggantikan posisi orang tua yang meninggal lebih dulu (Bij Plaatsvervulling)."});
+                }
+            }
+
+            if(s.ay+s.ib+s.sl+s.sp > 0) list.push({n: "Golongan II", v: 0, d: "Hak tertutup karena ada ahli waris Golongan I.", h: true});
+        } 
+        // GOLONGAN II (Orang Tua & Saudara)
+        else if (s.ay + s.ib + s.sl + s.sp > 0) {
+            let nOrtu = (s.ay > 0 ? 1 : 0) + (s.ib > 0 ? 1 : 0);
+            let nSdr = s.sl + s.sp;
+            let pOrtu = nOrtu === 2 ? Math.max(h/4, h/(nSdr+2)) : Math.max(h/4, h/(nSdr+1));
+            let pSdr = (h - (pOrtu * nOrtu)) / nSdr;
+
+            if(s.ay > 0) list.push({n: "Ayah", v: pOrtu, d: "Golongan II. Bagian minimal orang tua adalah 1/4."});
+            if(s.ib > 0) list.push({n: "Ibu", v: pOrtu, d: "Golongan II. Bagian minimal orang tua adalah 1/4."});
+            for(let i=1; i<=(s.sl+s.sp); i++) {
+                list.push({n: `Saudara ${i}`, v: pSdr, d: "Berbagi sisa bagian setelah jatah minimal orang tua terpenuhi."});
+            }
+        }
+        return list;
+    }
+
+    function engineIslam(s) {
+        let list = [];
+        let h = s.h;
+        let adaKeturunan = (s.al + s.ap + s.am) > 0;
+        let p = {};
+
+        // Dzawil Furud Base
+        if(s.suami > 0) p.suami = adaKeturunan ? 1/4 : 1/2;
+        if(s.istri > 0) p.istri = adaKeturunan ? 1/8 : 1/4;
+        if(s.ib > 0) {
+            // Check Gharawain (Hanya Ayah, Ibu, Suami/Istri)
+            if(!adaKeturunan && s.ay > 0 && (s.suami > 0 || s.istri > 0) && (s.sl+s.sp === 0)) {
+                p.ibu = "gharawain";
+            } else {
+                p.ibu = adaKeturunan ? 1/6 : 1/3;
+            }
+        }
+        if(s.ay > 0) p.ayah = (s.al > 0 || (s.am > 0)) ? 1/6 : "ashobah";
+
+        // AUL & RAD Detection
+        let totalF = 0;
+        for(let k in p) if(typeof p[k] === 'number') totalF += p[k];
+        let multiplier = totalF > 1 ? 1/totalF : 1;
+
+        if(totalF > 1) list.push({n: "PENYESUAIAN AUL", v: 0, d: "Total porsi melebihi 100%. Porsi diperkecil secara adil.", m: true});
+
+        let dist = 0;
+        if(s.suami > 0) { let v = (h*p.suami*multiplier)/s.suami; for(let i=1; i<=s.suami; i++){ list.push({n:`Suami`, v, d:"KHI Pasal 179."}); dist+=v; } }
+        if(s.istri > 0) { let v = (h*p.istri*multiplier)/s.istri; for(let i=1; i<=s.istri; i++){ list.push({n:`Istri ${i}`, v, d:"KHI Pasal 180."}); dist+=v; } }
+        
+        if(s.ib > 0) {
+            let v = 0;
+            if(p.ibu === "gharawain") {
+                v = (h - dist) * 1/3; // 1/3 dari sisa
+                list.push({n: "Ibu", v, d: "Kasus Gharawain: Ibu mendapat 1/3 dari sisa setelah porsi pasangan."});
+            } else {
+                v = h * p.ibu * multiplier;
+                list.push({n: "Ibu", v, d: `Porsi ${adaKeturunan?'1/6':'1/3'} sesuai Pasal 178 KHI.`});
+            }
+            dist += v;
+        }
+
+        if(s.ay > 0 && typeof p.ayah === 'number') {
+            let v = h * p.ayah * multiplier;
+            list.push({n: "Ayah", v, d: "Porsi tetap 1/6 karena ada keturunan."});
+            dist += v;
+        }
+
+        // SISA (Ashobah) & Ahli Waris Pengganti
+        let sisa = h - dist;
+        if(sisa > 0) {
+            let unitAnak = (s.al * 2) + s.ap + (s.am * 2); // Ambil asumsi anak meninggal dianggap laki-laki
+            if(unitAnak > 0) {
+                let perUnit = sisa / unitAnak;
+                for(let i=1; i<=s.al; i++) list.push({n:`Anak Laki ${i}`, v: perUnit*2, d: "Ahli waris Ashobah (2:1)."});
+                for(let i=1; i<=s.ap; i++) list.push({n:`Anak Perempuan ${i}`, v: perUnit, d: "Ahli waris Ashobah (1:2)."});
+                
+                // Cucu sebagai Ahli Waris Pengganti (Pasal 185 KHI)
+                if(s.am > 0 && s.cucu > 0) {
+                    let jatahCucu = (perUnit * 2 * s.am) / s.cucu;
+                    for(let i=1; i<=s.cucu; i++) list.push({n:`Cucu ${i} (AWP)`, v: jatahCucu, d: "Ahli Waris Pengganti sesuai Pasal 185 KHI."});
+                }
+            } else if (p.ayah === "ashobah") {
+                list.push({n: "Ayah", v: sisa, d: "Menerima sisa (Ashobah) karena tidak ada anak laki-laki."});
+            } else if (s.sl + s.sp > 0 && !(s.al > 0 || s.ay > 0)) {
+                let unitSdr = (s.sl * 2) + s.sp;
+                let perSdr = sisa / unitSdr;
+                for(let i=1; i<=s.sl; i++) list.push({n:`Sdr Laki ${i}`, v: perSdr*2, d: "Menerima sisa (Ashobah)."});
+                for(let i=1; i<=s.sp; i++) list.push({n:`Sdr Perempuan ${i}`, v: perSdr, d: "Menerima sisa (Ashobah)."});
+            }
+        }
+
+        if((s.al > 0 || s.ay > 0) && (s.sl+s.sp > 0)) {
+            list.push({n: "Kelompok Saudara", v: 0, d: "Terhijab Hirman oleh Anak Laki/Ayah.", h: true});
+        }
+
+        return list;
+    }
+
+    function renderResults(arr) {
+        const out = document.getElementById('outputArea');
+        out.innerHTML = "";
+        const printArea = document.getElementById('printReport');
+        printArea.innerHTML = `<h1 style="text-align:center">Laporan Waris - Kalkulator by Adien</h1><hr>`;
+
+        arr.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `person-card ${item.v > 0 ? 'active' : ''} ${item.h ? 'hijab' : ''} ${item.m ? 'meta' : ''}`;
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:900; font-size:14px; color:${item.m?'var(--accent)':'white'}">${item.n}</span>
+                    <span style="font-weight:900; color:var(--gold); font-size:16px;">${item.v > 0 ? formatter.format(item.v) : (item.m ? '' : 'Rp 0')}</span>
+                </div>
+                <p style="font-size:11px; color:var(--text-dim); margin-top:8px; line-height:1.5;">${item.d}</p>
+            `;
+            out.appendChild(card);
+
+            // For Print
+            if(!item.m) {
+                printArea.innerHTML += `<div class="print-card"><strong>${item.n}</strong>: ${item.v > 0 ? formatter.format(item.v) : 'Rp 0'}<br><small>${item.d}</small></div>`;
+            }
+        });
+    }
+
+    function preparePrint() {
+        if(document.getElementById('rawHarta').value === "") return alert("Hitung dulu sebelum mencetak.");
+        window.print();
+    }
+
+    setMode('perdata');
+</script>
+</body>
+</html>
