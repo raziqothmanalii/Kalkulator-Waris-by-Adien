@@ -1,295 +1,235 @@
+<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Waris by Adien</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Waris Pro</title>
 
-    <style>
-        :root { --primary: #2563eb; --bg: #fcfcfd; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #0f172a; }
-        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .input-rupiah { width: 100%; border: 2px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.2s; }
-        .input-rupiah:focus { border-color: var(--primary); background: #f8faff; }
-        .tab-active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-        .tab-inactive { background: #f1f5f9; color: #64748b; }
-        .btn-prime { background: var(--primary); color: white; font-weight: 800; padding: 18px; border-radius: 16px; width: 100%; transition: 0.3s; }
-        .btn-prime:hover { transform: translateY(-2px); }
-        
-        /* Floating Window Styles */
-        #welcomeOverlay {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
-            z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-content {
-            background: white; max-width: 500px; width: 100%; border-radius: 32px; padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center;
-        }
-    </style>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+:root {
+    --bg: #0f172a;
+    --text: #f1f5f9;
+    --card: #1e293b;
+    --primary: #2563eb;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+input {
+    background: #020617;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+}
+
+button {
+    background: var(--primary);
+    padding: 12px;
+    border-radius: 10px;
+    width: 100%;
+    font-weight: bold;
+}
+
+#welcome {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+</style>
 </head>
-<body onload="AdienFinal.init()">
 
-    <div id="welcomeOverlay">
-        <div class="modal-content">
-            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">⚖️</div>
-            <h2 class="text-2xl font-black mb-2">Kalkulator Waris by Adien</h2>
-            <div class="inline-block bg-orange-100 text-orange-700 text-[10px] font-bold px-3 py-1 rounded-full mb-6">TAHAP PENGEMBANGAN (BETA)</div>
-            
-            <p class="text-slate-500 text-sm leading-relaxed mb-6">
-                Aplikasi ini masih dalam tahap pengembangan intensif. Jika Anda menemukan <strong>bug, error,</strong> atau <strong>kesalahan kalkulasi</strong>, mohon kirimkan laporan Anda ke:
-            </p>
-            
-            <div class="bg-slate-50 p-4 rounded-2xl mb-8 font-mono text-sm text-blue-600 font-bold border border-slate-100">
-                raziqothmanalii@gmail.com
-            </div>
+<body onload="App.init()">
 
-            <button onclick="AdienFinal.closeWelcome()" class="btn-prime">SAYA MENGERTI & LANJUTKAN</button>
-            <p class="text-[10px] text-slate-400 mt-4 uppercase tracking-widest font-bold italic">Intellectual Property of Raziq Othman Ali</p>
-        </div>
+<div id="welcome">
+    <div class="card max-w-md text-center">
+        <h2 class="text-xl font-bold mb-3">⚖️ Kalkulator Waris</h2>
+        <p class="text-sm mb-4">
+        Aplikasi ini masih <b>BETA</b>.  
+        Hasil hanya simulasi dan <b>bukan fatwa resmi</b>.
+        </p>
+        <button onclick="App.start()">Saya Mengerti</button>
     </div>
+</div>
 
-    <header class="bg-white border-b border-slate-100 py-6 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tighter">Kalkulator Waris <span class="text-blue-600">by Adien</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Intellectual Property of Raziq Othman Ali</p>
-            </div>
-            <span class="bg-emerald-50 text-emerald-600 px-4 py-1 rounded-full text-[10px] font-bold hidden md:block">VERIFIED LOGIC V3.2</span>
-        </div>
-    </header>
+<div class="max-w-3xl mx-auto p-6 space-y-4">
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
-            <div class="lg:col-span-5 space-y-6">
-                <div class="glass-card p-8">
-                    <h3 class="font-extrabold text-lg mb-6">💰 Toolbox Keuangan</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-extrabold text-slate-400 uppercase mb-2 block">Harta Bruto</span>
-                            <input type="text" id="hartaRaw" class="input-rupiah" placeholder="Rp 0" oninput="AdienFinal.mask(this)">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><span class="text-[10px] font-extrabold text-slate-400 uppercase mb-2 block">Utang</span><input type="text" id="utangRaw" class="input-rupiah" placeholder="Rp 0" oninput="AdienFinal.mask(this)"></div>
-                            <div><span class="text-[10px] font-extrabold text-slate-400 uppercase mb-2 block">Biaya Jenazah</span><input type="text" id="biayaRaw" class="input-rupiah" placeholder="Rp 0" oninput="AdienFinal.mask(this)"></div>
-                        </div>
-                        <div class="p-4 bg-slate-50 rounded-2xl space-y-3 border border-slate-100">
-                            <label class="flex items-center justify-between cursor-pointer"><div class="flex items-center gap-3"><input type="checkbox" id="isGono" onchange="AdienFinal.sync()" class="w-4 h-4"><span class="text-sm font-bold">Gono-Gini (50%)</span></div></label>
-                            <label class="flex items-center justify-between cursor-pointer"><div class="flex items-center gap-3"><input type="checkbox" id="isZakat" onchange="AdienFinal.sync()" class="w-4 h-4"><span class="text-sm font-bold">Zakat Mal (2.5%)</span></div></label>
-                        </div>
-                    </div>
-                </div>
+<div class="card">
+<h3 class="font-bold mb-2">Input</h3>
 
-                <div class="glass-card p-8">
-                    <h3 class="font-extrabold text-lg mb-6">👥 Ahli Waris</h3>
-                    <div class="space-y-5">
-                        <div class="flex gap-2">
-                            <select id="genderP" class="input-rupiah !w-1/3" onchange="AdienFinal.sync()"><option value="none">Status</option><option value="istri">Istri</option><option value="suami">Suami</option></select>
-                            <input type="text" id="namaP" class="input-rupiah !w-2/3" placeholder="Nama Pasangan">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 border-2 border-slate-50 rounded-2xl"><label class="flex items-center gap-2 mb-2"><input type="checkbox" id="hasIbu" onchange="AdienFinal.sync()"><span class="text-xs font-bold uppercase">Ibu</span></label><input type="text" id="namaIbu" class="input-rupiah !py-2 !text-xs" placeholder="Nama Ibu"></div>
-                            <div class="p-4 border-2 border-slate-50 rounded-2xl"><label class="flex items-center gap-2 mb-2"><input type="checkbox" id="hasAyah" onchange="AdienFinal.sync()"><span class="text-xs font-bold uppercase">Ayah</span></label><input type="text" id="namaAyah" class="input-rupiah !py-2 !text-xs" placeholder="Nama Ayah"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="al" class="input-rupiah" placeholder="Jml Anak Lk" oninput="AdienFinal.render()">
-                            <input type="number" id="ap" class="input-rupiah" placeholder="Jml Anak Pr" oninput="AdienFinal.render()">
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 border-t pt-4">
-                            <input type="number" id="sl" class="input-rupiah" placeholder="Sdr Laki-laki" oninput="AdienFinal.render()">
-                            <input type="number" id="sp" class="input-rupiah" placeholder="Sdr Perempuan" oninput="AdienFinal.render()">
-                        </div>
-                        <div id="dynamicList" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
-                    </div>
-                </div>
-            </div>
+<input id="harta" placeholder="Harta">
+<input id="utang" placeholder="Utang">
+<input id="biaya" placeholder="Biaya">
 
-            <div class="lg:col-span-7">
-                <div class="glass-card p-8 sticky top-28">
-                    <div class="flex justify-between items-start mb-8">
-                        <div><h2 class="text-3xl font-black tracking-tighter">Hasil Waris</h2><p class="text-slate-400 text-sm italic" id="lawMode">Syariat Islam (KHI)</p></div>
-                        <div class="text-right"><span class="text-[10px] font-extrabold text-slate-400 uppercase">Harta Bersih</span><h3 id="netDisplay" class="text-3xl font-mono font-bold text-blue-600">Rp 0</h3></div>
-                    </div>
+<select id="pasangan">
+<option value="none">Tidak Ada Pasangan</option>
+<option value="istri">Istri</option>
+<option value="suami">Suami</option>
+</select>
 
-                    <div class="flex gap-2 mb-8 bg-slate-100 p-1 rounded-2xl">
-                        <button id="btnIslam" onclick="AdienFinal.setMode('islam')" class="flex-1 py-3 rounded-xl font-bold transition tab-active">ISLAM</button>
-                        <button id="btnBW" onclick="AdienFinal.setMode('bw')" class="flex-1 py-3 rounded-xl font-bold transition tab-inactive">PERDATA</button>
-                    </div>
+<label><input type="checkbox" id="ayah"> Ayah</label>
+<label><input type="checkbox" id="ibu"> Ibu</label>
 
-                    <div id="alertInfo" class="mb-4 hidden"></div>
+<input id="al" type="number" placeholder="Anak laki-laki">
+<input id="ap" type="number" placeholder="Anak perempuan">
 
-                    <div id="results" class="space-y-3 min-h-[300px]">
-                        <div class="flex flex-col items-center justify-center py-20 text-slate-300 italic text-sm">Input data dan klik eksekusi</div>
-                    </div>
+</div>
 
-                    <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-[11px] leading-relaxed mt-8">
-                        <strong>DISCLAIMER:</strong> Kalkulator ini bersifat simulasi. Hasil akhir yang berkekuatan hukum tetap wajib merujuk pada Fatwa Waris atau Penetapan Pengadilan. Kami sangat menyarankan konsultasi dengan ahli hukum.
-                    </div>
+<button onclick="App.hitung()">Hitung</button>
 
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button onclick="AdienFinal.calculate()" class="btn-prime">EKSEKUSI HITUNG</button>
-                        <button id="pdfBtn" onclick="AdienFinal.pdf()" class="bg-white border-2 border-slate-200 rounded-16 p-4 font-bold disabled:opacity-30 uppercase text-xs" disabled>Ekspor Laporan PDF</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+<div id="hasil" class="card"></div>
 
-    <footer class="py-12 border-t border-slate-100 text-center text-slate-400 text-[10px] font-bold tracking-widest uppercase">
-        Kalkulator Waris by Adien<br>
-        <span class="text-slate-300 italic normal-case">© 2026 Intellectual Property of Raziq Othman Ali</span>
-    </footer>
+</div>
 
-    <script>
-        const AdienFinal = {
-            state: { mode: 'islam', net: 0, results: [], meta: {} },
+<script>
+const App = {
 
-            init() {
-                const saved = localStorage.getItem('adien_app_v3');
-                if(saved) {
-                    const d = JSON.parse(saved);
-                    Object.keys(d).forEach(k => {
-                        const el = document.getElementById(k);
-                        if(el) el.type === 'checkbox' ? el.checked = d[k] : el.value = d[k];
-                    });
-                }
-                this.render();
-            },
+start() {
+    document.getElementById('welcome').style.display='none';
+},
 
-            closeWelcome() { document.getElementById('welcomeOverlay').style.display = 'none'; },
+init(){},
 
-            mask(el) {
-                let val = el.value.replace(/\D/g, "");
-                el.value = val ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val) : "";
-                this.sync();
-            },
+num(id){
+    return parseInt(document.getElementById(id).value)||0;
+},
 
-            sync() {
-                const data = {};
-                document.querySelectorAll('input, select').forEach(el => { if(el.id) data[el.id] = el.type === 'checkbox' ? el.checked : el.value; });
-                localStorage.setItem('adien_app_v3', JSON.stringify(data));
-            },
+val(id){
+    return parseFloat(document.getElementById(id).value)||0;
+},
 
-            render() {
-                const box = document.getElementById('dynamicList');
-                const counts = { al: this.num('al'), ap: this.num('ap'), sl: this.num('sl'), sp: this.num('sp') };
-                box.innerHTML = '';
-                const f = (l, i, c) => `<input type="text" id="${i}" class="input-rupiah !py-2 !text-xs mb-2 border-l-4 ${c}" placeholder="Nama ${l}">`;
-                for(let i=1; i<=counts.al; i++) box.innerHTML += f(`Anak Lk ${i}`, `name_al_${i}`, 'border-blue-500');
-                for(let i=1; i<=counts.ap; i++) box.innerHTML += f(`Anak Pr ${i}`, `name_ap_${i}`, 'border-pink-500');
-                for(let i=1; i<=counts.sl; i++) box.innerHTML += f(`Sdr Lk ${i}`, `name_sl_${i}`, 'border-slate-400');
-                for(let i=1; i<=counts.sp; i++) box.innerHTML += f(`Sdr Pr ${i}`, `name_sp_${i}`, 'border-slate-300');
-                this.sync();
-            },
+fmt(n){
+    return "Rp " + n.toLocaleString("id-ID");
+},
 
-            num(id) { return parseInt(document.getElementById(id).value) || 0; },
-            val(id) { return parseFloat(document.getElementById(id).value.replace(/\D/g, "")) || 0; },
-            fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n); },
+hitung(){
 
-            setMode(m) {
-                this.state.mode = m;
-                document.getElementById('btnIslam').className = `flex-1 py-3 rounded-xl font-bold transition ${m==='islam'?'tab-active':'tab-inactive'}`;
-                document.getElementById('btnBW').className = `flex-1 py-3 rounded-xl font-bold transition ${m==='bw'?'tab-active':'tab-inactive'}`;
-                document.getElementById('lawMode').innerText = m === 'islam' ? 'Syariat Islam (KHI)' : 'Hukum Perdata (BW)';
-                if(this.state.net > 0) this.calculate();
-            },
+let total = this.val("harta") - this.val("utang") - this.val("biaya");
 
-            calculate() {
-                const bruto = this.val('hartaRaw');
-                const gono = document.getElementById('isGono').checked ? bruto/2 : 0;
-                let sisa = bruto - gono - this.val('utangRaw') - this.val('biayaRaw');
-                let zakat = (document.getElementById('isZakat').checked && sisa >= 115000000) ? sisa * 0.025 : 0;
-                sisa -= zakat;
+let res = [];
+let explanation = [];
+let pool = total;
 
-                if(sisa < 0) return alert("Peringatan: Harta tidak mencukupi!");
-                this.state.net = sisa;
-                this.state.meta = { bruto, gono, zakat, sisa };
-                document.getElementById('netDisplay').innerText = this.fmt(sisa);
-                this.state.mode === 'islam' ? this.logicIslam(sisa) : this.logicBW(sisa);
-                this.display();
-            },
+const al = this.num("al");
+const ap = this.num("ap");
+const hasAnak = (al+ap)>0;
 
-            logicIslam(total) {
-                const res = []; let pool = total;
-                const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
-                const gP = document.getElementById('genderP').value;
-                const hI = document.getElementById('hasIbu').checked;
-                const hA = document.getElementById('hasAyah').checked;
+const ayah = document.getElementById("ayah").checked;
+const ibu = document.getElementById("ibu").checked;
+const pasangan = document.getElementById("pasangan").value;
 
-                if(gP !== 'none') {
-                    let p = (al+ap > 0) ? (gP==='istri'?1/8:1/4) : (gP==='istri'?1/4:1/2);
-                    res.push({ n: document.getElementById('namaP').value || 'Pasangan', r: 'Zul Faraidh', p: (p===1/8?'1/8':'1/4'), v: total*p, l: 'Ps. 179-180 KHI' });
-                    pool -= total*p;
-                }
-                if(hI) {
-                    let p = (al+ap > 0 || (sl+sp)>1) ? 1/6 : 1/3;
-                    res.push({ n: document.getElementById('namaIbu').value || 'Ibu', r: 'Zul Faraidh', p: (p===1/6?'1/6':'1/3'), v: total*p, l: 'Ps. 178 KHI' });
-                    pool -= total*p;
-                }
-                if(hA && al > 0) {
-                    res.push({ n: document.getElementById('namaAyah').value || 'Ayah', r: 'Zul Faraidh', p: '1/6', v: total*(1/6), l: 'Ps. 177 KHI' });
-                    pool -= total*(1/6);
-                }
-                if(al+ap > 0) {
-                    const sh = pool / (al*2 + ap);
-                    for(let i=1; i<=al; i++) res.push({ n: document.getElementById(`name_al_${i}`).value || `Anak Lk ${i}`, r: 'Asabah', p: '2:1', v: sh*2, l: 'Ps. 176 KHI' });
-                    for(let i=1; i<=ap; i++) res.push({ n: document.getElementById(`name_ap_${i}`).value || `Anak Pr ${i}`, r: 'Asabah', p: '1:1', v: sh, l: 'Ps. 176 KHI' });
-                    pool = 0;
-                }
-                if(!hA && al === 0 && sl+sp > 0) {
-                    const sh = pool / (sl*2 + sp);
-                    for(let i=1; i<=sl; i++) res.push({ n: document.getElementById(`name_sl_${i}`).value || `Sdr Lk ${i}`, r: 'Asabah Sdr', p: '2:1', v: sh*2, l: 'Ps. 181 KHI' });
-                    for(let i=1; i<=sp; i++) res.push({ n: document.getElementById(`name_sp_${i}`).value || `Sdr Pr ${i}`, r: 'Asabah Sdr', p: '1:1', v: sh, l: 'Ps. 182 KHI' });
-                    pool = 0;
-                }
-                if(pool > 0 && hA) res.push({ n: document.getElementById('namaAyah').value || 'Ayah', r: 'Asabah', p: 'Sisa', v: pool, l: 'Ps. 177 KHI' });
-                this.state.results = res;
-            },
+// === PASANGAN ===
+if(pasangan!="none"){
+let p = hasAnak ? (pasangan=="istri"?1/8:1/4) : (pasangan=="istri"?1/4:1/2);
+let v = total*p;
 
-            logicBW(total) {
-                const res = [];
-                const al = this.num('al'), ap = this.num('ap'), hasP = document.getElementById('genderP').value !== 'none';
-                const hasIbu = document.getElementById('hasIbu').checked, hasAyah = document.getElementById('hasAyah').checked;
-                const sl = this.num('sl'), sp = this.num('sp');
-                const info = document.getElementById('alertInfo');
-                info.classList.add('hidden');
+res.push([pasangan,v]);
+pool-=v;
 
-                if(al+ap+(hasP?1:0) > 0) {
-                    const head = al+ap+(hasP?1:0); const sh = total/head;
-                    if(hasP) res.push({ n: document.getElementById('namaP').value || 'Pasangan', r: 'Golongan I', p: `1/${head}`, v: sh, l: 'Ps. 852 BW' });
-                    for(let i=1; i<=al; i++) res.push({ n: document.getElementById(`name_al_${i}`).value || `Anak Lk ${i}`, r: 'Golongan I', p: `1/${head}`, v: sh, l: 'Ps. 852 BW' });
-                    for(let i=1; i<=ap; i++) res.push({ n: document.getElementById(`name_ap_${i}`).value || `Anak Pr ${i}`, r: 'Golongan I', p: `1/${head}`, v: sh, l: 'Ps. 852 BW' });
-                    if(hasIbu || hasAyah || sl+sp > 0) { info.innerHTML = `<div class="p-3 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-xl italic">Info: Golongan II otomatis tertutup oleh adanya keturunan/pasangan (Ps. 832 BW).</div>`; info.classList.remove('hidden'); }
-                } else if(hasIbu || hasAyah || sl+sp > 0) {
-                    const head = (hasIbu?1:0) + (hasAyah?1:0) + sl + sp; const sh = total/head;
-                    if(hasIbu) res.push({ n: document.getElementById('namaIbu').value || 'Ibu', r: 'Golongan II', p: `1/${head}`, v: sh, l: 'Ps. 854 BW' });
-                    if(hasAyah) res.push({ n: document.getElementById('namaAyah').value || 'Ayah', r: 'Golongan II', p: `1/${head}`, v: sh, l: 'Ps. 854 BW' });
-                    for(let i=1; i<=sl; i++) res.push({ n: document.getElementById(`name_sl_${i}`).value || `Sdr Lk ${i}`, r: 'Golongan II', p: `1/${head}`, v: sh, l: 'Ps. 854 BW' });
-                    for(let i=1; i<=sp; i++) res.push({ n: document.getElementById(`name_sp_${i}`).value || `Sdr Pr ${i}`, r: 'Golongan II', p: `1/${head}`, v: sh, l: 'Ps. 854 BW' });
-                }
-                this.state.results = res;
-            },
+explanation.push(`Pasangan mendapat ${p} karena ${hasAnak?"ada anak":"tidak ada anak"}`);
+}
 
-            display() {
-                const box = document.getElementById('results'); box.innerHTML = '';
-                this.state.results.forEach(r => {
-                    box.innerHTML += `<div class="p-5 bg-white border border-slate-100 rounded-2xl flex justify-between items-center"><div><p class="font-bold text-sm text-slate-800">${r.n}</p><div class="flex gap-2 mt-1 items-center"><span class="text-[9px] font-extrabold text-slate-400 uppercase">${r.r} • ${r.p}</span><span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[8px] font-bold border border-blue-100">${r.l}</span></div></div><p class="font-mono font-bold text-blue-600">${this.fmt(r.v)}</p></div>`;
-                });
-                document.getElementById('pdfBtn').disabled = false;
-            },
+// === IBU ===
+if(ibu){
+let p = hasAnak ? 1/6 : 1/3;
+let v = total*p;
 
-            pdf() {
-                const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                doc.setFont("helvetica", "bold"); doc.text("LAPORAN WARIS BY ADIEN", 105, 20, { align: 'center' });
-                doc.autoTable({ startY: 30, head: [['Deskripsi', 'Nilai (IDR)']], body: [['Harta Bruto', this.fmt(this.state.meta.bruto)], ['Gono-Gini', this.fmt(this.state.meta.gono)], ['Zakat Mal', this.fmt(this.state.meta.zakat)], ['TOTAL BERSIH', this.fmt(this.state.net)]], theme: 'grid' });
-                doc.autoTable({ startY: doc.lastAutoTable.finalY + 10, head: [['Nama', 'Porsi', 'Dasar Hukum', 'Nilai Waris']], body: this.state.results.map(r => [r.n, r.p, r.l, this.fmt(r.v)]) });
-                doc.save('Waris_Adien_Laporan.pdf');
-            }
-        };
-    </script>
+res.push(["Ibu",v]);
+pool-=v;
+
+explanation.push(`Ibu mendapat ${p}`);
+}
+
+// === AYAH ===
+if(ayah){
+if(hasAnak){
+let v = total*(1/6);
+res.push(["Ayah",v]);
+pool-=v;
+
+if(al==0 && pool>0){
+res.push(["Ayah (Ashabah)",pool]);
+explanation.push("Ayah menjadi ashabah karena tidak ada anak laki-laki");
+pool=0;
+}
+
+}else{
+res.push(["Ayah",pool]);
+explanation.push("Ayah mengambil seluruh sisa sebagai ashabah");
+pool=0;
+}
+}
+
+// === ANAK ===
+if(pool>0 && hasAnak){
+
+let div = (al*2 + ap);
+
+if(div>0){
+let share = pool/div;
+
+if(al>0){
+res.push([`Anak Laki (${al})`, share*2*al]);
+}
+if(ap>0){
+res.push([`Anak Perempuan (${ap})`, share*ap]);
+}
+
+explanation.push("Anak laki-laki mendapat 2 bagian dibanding perempuan");
+}
+
+pool=0;
+}
+
+// === RADD ===
+if(pool>0){
+let totalShare = res.reduce((s,r)=>s+r[1],0);
+
+res = res.map(r=>{
+return [r[0], r[1] + (r[1]/totalShare)*pool];
+});
+
+explanation.push("Sisa dibagikan dengan metode radd");
+}
+
+// === OUTPUT ===
+let html = "<h3 class='font-bold mb-3'>Hasil</h3>";
+
+res.forEach(r=>{
+html += `<div>${r[0]} : ${this.fmt(r[1])}</div>`;
+});
+
+html += "<hr class='my-3'>";
+html += "<h4 class='font-bold'>Penjelasan (Fatwa Style)</h4>";
+
+explanation.forEach(e=>{
+html += `<div>• ${e}</div>`;
+});
+
+html += "<hr class='my-3 text-red-400'>";
+html += "<div class='text-red-400 text-sm'>DISCLAIMER: Ini hanya simulasi. Sangat disarankan konsultasi dengan ahli.</div>";
+
+document.getElementById("hasil").innerHTML = html;
+
+}
+
+}
+</script>
+
 </body>
 </html>
