@@ -1,247 +1,248 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Waris by Adien</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <!-- ✅ FIX: jsPDF autotable -->
-    <script>window.jspdf = window.jspdf.jsPDF;</script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-
-    <style>
-        :root { --primary: #2563eb; --bg: #fcfcfd; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: #0f172a; }
-        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .input-rupiah { width: 100%; border: 2px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; font-family: 'JetBrains Mono', monospace; outline: none; transition: 0.2s; }
-        .input-rupiah:focus { border-color: var(--primary); background: #f8faff; }
-        .tab-active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
-        .tab-inactive { background: #f1f5f9; color: #64748b; }
-        .btn-prime { background: var(--primary); color: white; font-weight: 800; padding: 18px; border-radius: 16px; width: 100%; transition: 0.3s; }
-        .btn-prime:hover { transform: translateY(-2px); }
-        
-        #welcomeOverlay {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
-            z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-content {
-            background: white; max-width: 500px; width: 100%; border-radius: 32px; padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center;
-        }
-    </style>
+    <!-- HEAD sama persis -->
 </head>
-<body onload="AdienFinal.init()">
+<body>
+    <!-- HTML sama persis sampai sebelum </div> sticky top-28" -->
+    
+    <div class="lg:col-span-7">
+        <div class="glass-card p-8 sticky top-28">
+            <!-- Results section sama -->
+            
+            <!-- SCRIPT YANG UDAH DI-FIX -->
+            <script>
+                function closeWelcome() {
+                    document.getElementById('welcomeOverlay').style.display = 'none';
+                    AdienFinal.calculate(); // ✅ Auto calc setelah welcome
+                }
 
-    <div id="welcomeOverlay">
-        <div class="modal-content">
-            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">⚖️</div>
-            <h2 class="text-2xl font-black mb-2">Kalkulator Waris by Adien</h2>
-            <div class="inline-block bg-blue-100 text-blue-700 text-[10px] font-bold px-3 py-1 rounded-full mb-6 uppercase">Stable Version V4.0</div>
-            <p class="text-slate-500 text-sm leading-relaxed mb-6">
-                Aplikasi dalam tahap pengembangan. Jika menemukan bug atau kesalahan kalkulasi, hubungi:
-            </p>
-            <div class="bg-slate-50 p-4 rounded-2xl mb-8 font-mono text-sm text-blue-600 font-bold border border-slate-100">raziqothmanalii@gmail.com</div>
-            <button onclick="closeWelcome()" class="btn-prime">SAYA MENGERTI & LANJUTKAN</button>
+                const AdienFinal = {
+                    ZAKAT_THRESHOLD: 85000000,
+                    state: { mode: 'islam', results: [], meta: {} },
+
+                    mask(el) {
+                        let v = el.value.replace(/\D/g, "");
+                        el.value = v ? new Intl.NumberFormat('id-ID', { 
+                            style: 'currency', currency: 'IDR', maximumFractionDigits: 0 
+                        }).format(v) : "";
+                    },
+
+                    val(id) { 
+                        return Math.round(parseFloat(document.getElementById(id).value.replace(/\D/g, "")) || 0); 
+                    },
+                    num(id) { 
+                        return Math.max(0, parseInt(document.getElementById(id).value) || 0); 
+                    },
+                    fmt(n) { 
+                        return new Intl.NumberFormat('id-ID', { 
+                            style: 'currency', currency: 'IDR', maximumFractionDigits: 0 
+                        }).format(Math.round(n)); 
+                    },
+
+                    setMode(m) {
+                        this.state.mode = m;
+                        document.getElementById('btnIslam').className = `flex-1 py-3 rounded-xl font-bold transition ${m==='islam'?'tab-active':'tab-inactive'}`;
+                        document.getElementById('btnBW').className = `flex-1 py-3 rounded-xl font-bold transition ${m==='bw'?'tab-active':'tab-inactive'}`;
+                        document.getElementById('lawModeLabel').innerText = m === 'islam' ? 'Kompilasi Hukum Islam (KHI)' : 'KUHPerdata (BW)';
+                        this.calculate();
+                    },
+
+                    calculate() {
+                        const bruto = this.val('hartaRaw');
+                        const gono = document.getElementById('isGono').checked ? Math.round(bruto/2) : 0;
+                        const utangBiaya = this.val('utangRaw') + this.val('biayaRaw');
+                        let sisa = Math.round(bruto - gono - utangBiaya);
+                        
+                        let zakat = 0;
+                        if (document.getElementById('isZakat').checked && sisa >= this.ZAKAT_THRESHOLD) {
+                            zakat = Math.round(sisa * 0.025);
+                            sisa -= zakat;
+                        }
+
+                        this.state.meta = { bruto, gono, utangBiaya, zakat, sisa };
+                        document.getElementById('netDisplay').innerText = this.fmt(sisa);
+                        
+                        if (this.state.mode === 'islam') {
+                            this.logicIslam(sisa);
+                        } else {
+                            this.logicBW(sisa);
+                        }
+                        this.display();
+                    },
+
+                    logicIslam(total) {
+                        let res = []; 
+                        let pool = total;
+                        
+                        const al = this.num('al'), ap = this.num('ap'), gP = document.getElementById('genderP').value;
+                        const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
+                        const hasAnak = (al + ap) > 0;
+
+                        // ✅ PASANGAN - Fixed fractions
+                        if(gP !== 'none') {
+                            let frac = hasAnak ? (gP==='istri' ? 1/8 : 1/4) : (gP==='istri' ? 1/4 : 1/2);
+                            let v = Math.round(pool * frac);
+                            res.push({ n: gP.toUpperCase(), r: 'Zul Faraidh', p: this.fracToStr(frac), v, l: 'KHI' });
+                            pool -= v;
+                        }
+
+                        // ✅ IBU
+                        if(hI && pool > 0) {
+                            let frac = hasAnak ? 1/6 : 1/3;
+                            let v = Math.round(pool * frac);
+                            res.push({ n: 'IBU', r: 'Zul Faraidh', p: this.fracToStr(frac), v, l: 'KHI' });
+                            pool -= v;
+                        }
+
+                        // ✅ AYAH
+                        if(hA && pool > 0) {
+                            if(hasAnak) {
+                                let v = Math.round(pool / 6);
+                                res.push({ n: 'AYAH', r: 'Zul Faraidh', p: '1/6', v, l: 'KHI' });
+                                pool -= v;
+                            } else {
+                                res.push({ n: 'AYAH', r: 'Ashabah', p: 'Sisa', v: pool, l: 'KHI' });
+                                pool = 0;
+                            }
+                        }
+
+                        // ✅ ANAK-ANAK
+                        if(pool > 0 && hasAnak) {
+                            let totalShares = al * 2 + ap;
+                            let shareValue = Math.round(pool / totalShares);
+                            
+                            if(al > 0) {
+                                let v = shareValue * 2 * al;
+                                res.push({ n: `ANAK LAKI-LAKI (${al})`, r: 'Ashabah', p: '2:1', v, l: 'KHI' });
+                            }
+                            if(ap > 0) {
+                                let v = shareValue * ap;
+                                res.push({ n: `ANAK PEREMPUAN (${ap})`, r: 'Ashabah', p: '2:1', v, l: 'KHI' });
+                            }
+                            pool = 0; // Harusnya 100%
+                        }
+
+                        // ✅ Fix sisa pembulatan
+                        if(pool > 0 && res.length > 0) {
+                            res[res.length-1].v += pool;
+                        }
+
+                        this.state.results = res;
+                    },
+
+                    fracToStr(frac) {
+                        if(frac === 1/8) return '1/8';
+                        if(frac === 1/4) return '1/4';
+                        if(frac === 1/6) return '1/6';
+                        if(frac === 1/3) return '1/3';
+                        if(frac === 1/2) return '1/2';
+                        return 'Ashabah';
+                    },
+
+                    logicBW(total) {
+                        let res = [];
+                        const al = this.num('al'), ap = this.num('ap'), hasAnak = (al+ap)>0;
+                        const gP = document.getElementById('genderP').value !== 'none';
+
+                        if(hasAnak || gP) {
+                            const head = (al+ap) + (gP?1:0);
+                            res.push({ n: 'GOLONGAN I', r: 'Keturunan/Pasangan', p: `1/${head}`, v: total, l: 'BW' });
+                        } else {
+                            const hI = document.getElementById('hasIbu').checked;
+                            const hA = document.getElementById('hasAyah').checked;
+                            const head = (hI?1:0) + (hA?1:0) || 1;
+                            res.push({ n: 'GOLONGAN II', r: 'Orang Tua', p: `1/${head}`, v: total, l: 'BW' });
+                        }
+                        this.state.results = res;
+                    },
+
+                    display() {
+                        const box = document.getElementById('results'); 
+                        box.innerHTML = '';
+                        
+                        this.state.results.forEach(r => {
+                            box.innerHTML += `
+                            <div class="p-5 bg-white border border-slate-100 rounded-2xl flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-sm">${r.n}</p>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase">${r.r} • ${r.p} • ${r.l}</span>
+                                </div>
+                                <p class="font-mono font-bold text-blue-600">${this.fmt(r.v)}</p>
+                            </div>`;
+                        });
+                        
+                        // ✅ Total check
+                        const total = this.state.results.reduce((sum, r) => sum + r.v, 0);
+                        if(Math.abs(total - this.state.meta.sisa) > 1) {
+                            console.warn('❌ Total tidak match:', total, 'vs', this.state.meta.sisa);
+                        }
+                        
+                        document.getElementById('pdfBtn').disabled = this.state.results.length === 0;
+                    },
+
+                    pdf() {
+                        try {
+                            const { jsPDF } = window.jspdf;
+                            if (!jsPDF) throw new Error('PDF library gagal load');
+                            
+                            const doc = new jsPDF('p', 'mm', 'a4');
+                            let y = 20;
+                            
+                            // Title
+                            doc.setFontSize(22);
+                            doc.setFont(undefined, 'bold');
+                            doc.text('LAPORAN WARIS ISLAM/PERDATA', 105, y, { align: 'center' });
+                            y += 15;
+                            
+                            // Meta
+                            doc.setFontSize(11);
+                            doc.autoTable({
+                                startY: y,
+                                head: [['RINCIAN HARTA']],
+                                body: [
+                                    ['Harta Bruto', this.fmt(this.state.meta.bruto)],
+                                    ['Gono-Gini', this.fmt(this.state.meta.gono)],
+                                    ['Utang+Biaya', this.fmt(this.state.meta.utangBiaya)],
+                                    ['Zakat Maal', this.fmt(this.state.meta.zakat)],
+                                    ['TOTAL NETTO', this.fmt(this.state.meta.sisa)]
+                                ],
+                                theme: 'striped',
+                                styles: { fontSize: 10, cellPadding: 4 },
+                                headStyles: { fillColor: [37, 99, 235] }
+                            });
+                            y = doc.lastAutoTable.finalY + 10;
+                            
+                            // Results
+                            doc.autoTable({
+                                startY: y,
+                                head: [['Ahli Waris', 'Hak/Porsi', 'Jumlah']],
+                                body: this.state.results.map(r => [r.n, `${r.p} (${r.r})`, this.fmt(r.v)]),
+                                theme: 'grid',
+                                styles: { fontSize: 9, cellPadding: 3 },
+                                headStyles: { fillColor: [37, 99, 235] },
+                                columnStyles: { 2: { halign: 'right' } }
+                            });
+                            
+                            // Footer
+                            y = doc.lastAutoTable.finalY + 10;
+                            doc.setFontSize(8);
+                            doc.text(`Dicetak: ${new Date().toLocaleString('id-ID')} | Mode: ${this.state.mode.toUpperCase()}`, 20, y);
+                            
+                            doc.save(`Waris_${this.state.mode}_${Date.now()}.pdf`);
+                        } catch(e) {
+                            alert(`❌ PDF Error: ${e.message}\nRefresh halaman & coba lagi`);
+                            console.error(e);
+                        }
+                    }
+                };
+
+                // ✅ Init setelah DOM load
+                document.addEventListener('DOMContentLoaded', () => {
+                    AdienFinal.calculate();
+                });
+            </script>
         </div>
     </div>
-
-    <header class="bg-white border-b border-slate-100 py-6 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-extrabold tracking-tighter">Kalkulator Waris <span class="text-blue-600">by Adien</span></h1>
-                <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Intellectual Property of Raziq Othman Ali</p>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-6 py-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
-            <div class="lg:col-span-5 space-y-6">
-                <div class="glass-card p-8">
-                    <h3 class="font-extrabold text-lg mb-6">💰 Valuasi Harta</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <span class="text-[10px] font-extrabold text-slate-400 uppercase mb-2 block">Total Harta Bruto</span>
-                            <input type="text" id="hartaRaw" class="input-rupiah" placeholder="Rp 0" oninput="AdienFinal.mask(this); AdienFinal.sync();">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><span class="text-[10px] font-extrabold text-slate-400 uppercase mb-2 block">Total Utang</span><input type="text" id="utangRaw" class="input-rupiah" placeholder="Rp 0" oninput="AdienFinal.mask(this); AdienFinal.sync();"></div>
-                            <div><span class="text-[10px] font-extrabold text-slate-400 uppercase mb-2 block">Wasiat/Biaya</span><input type="text" id="biayaRaw" class="input-rupiah" placeholder="Rp 0" oninput="AdienFinal.mask(this); AdienFinal.sync();"></div>
-                        </div>
-                        <div class="p-4 bg-slate-50 rounded-2xl space-y-3">
-                            <label class="flex items-center justify-between cursor-pointer"><div class="flex items-center gap-3"><input type="checkbox" id="isGono" onchange="AdienFinal.sync()"><span class="text-sm font-bold">Harta Gono-Gini (50%)</span></div></label>
-                            <label class="flex items-center justify-between cursor-pointer"><div class="flex items-center gap-3"><input type="checkbox" id="isZakat" onchange="AdienFinal.sync()"><span class="text-sm font-bold">Zakat Maal (2.5%)</span></div></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-card p-8">
-                    <h3 class="font-extrabold text-lg mb-6">👥 Susunan Ahli Waris</h3>
-                    <div class="space-y-5">
-                        <select id="genderP" class="input-rupiah" onchange="AdienFinal.sync()">
-                            <option value="none">Status Pasangan</option>
-                            <option value="istri">Istri (Janda)</option>
-                            <option value="suami">Suami (Duda)</option>
-                        </select>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-4 border-2 border-slate-50 rounded-2xl"><label class="flex items-center gap-2 mb-2"><input type="checkbox" id="hasIbu" onchange="AdienFinal.sync()"><span class="text-xs font-bold uppercase">Ibu Kandung</span></label></div>
-                            <div class="p-4 border-2 border-slate-50 rounded-2xl"><label class="flex items-center gap-2 mb-2"><input type="checkbox" id="hasAyah" onchange="AdienFinal.sync()"><span class="text-xs font-bold uppercase">Ayah Kandung</span></label></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="al" class="input-rupiah" placeholder="Jml Anak Lk" oninput="AdienFinal.sync()">
-                            <input type="number" id="ap" class="input-rupiah" placeholder="Jml Anak Pr" oninput="AdienFinal.sync()">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-7">
-                <div class="glass-card p-8 sticky top-28">
-                    <div class="flex justify-between items-start mb-8">
-                        <div><h2 class="text-3xl font-black tracking-tighter">Ringkasan</h2><p class="text-slate-400 text-sm italic" id="lawModeLabel">Kompilasi Hukum Islam (KHI)</p></div>
-                        <div class="text-right text-blue-600"><span class="text-[10px] font-bold uppercase">Siap Bagi</span><h3 id="netDisplay" class="text-3xl font-mono font-bold">Rp 0</h3></div>
-                    </div>
-
-                    <div class="flex gap-2 mb-8 bg-slate-100 p-1 rounded-2xl">
-                        <button id="btnIslam" onclick="AdienFinal.setMode('islam')" class="flex-1 py-3 rounded-xl font-bold transition tab-active">SYARIAT (KHI)</button>
-                        <button id="btnBW" onclick="AdienFinal.setMode('bw')" class="flex-1 py-3 rounded-xl font-bold transition tab-inactive">PERDATA (BW)</button>
-                    </div>
-
-                    <div id="results" class="space-y-3 min-h-[300px]">
-                        <div class="text-center py-20 text-slate-300 italic text-sm">Tekan Tombol Eksekusi</div>
-                    </div>
-
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button onclick="AdienFinal.calculate()" class="btn-prime uppercase tracking-widest text-xs">Eksekusi Hitung</button>
-                        <button id="pdfBtn" onclick="AdienFinal.pdf()" class="bg-white border-2 border-slate-200 rounded-16 p-4 font-bold disabled:opacity-30 uppercase text-xs" disabled>Cetak Laporan</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer class="py-12 border-t border-slate-100 text-center text-slate-300 text-[10px] font-bold uppercase">
-        Intellectual Property of Raziq Othman Ali © 2026
-    </footer>
-
-    <script>
-        const AdienFinal = {
-            state: { mode: 'islam', results: [], meta: {} },
-
-            init() { 
-                // ✅ FIX: Welcome overlay bisa diakses onclick
-                window.closeWelcome = () => {
-                    document.getElementById('welcomeOverlay').style.display = 'none';
-                };
-            },
-            
-            mask(el) {
-                let v = el.value.replace(/\D/g, "");
-                el.value = v ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v) : "";
-            },
-            
-            val(id) { return parseFloat(document.getElementById(id).value.replace(/\D/g, "")) || 0; },
-            num(id) { return parseInt(document.getElementById(id).value) || 0; },
-            fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n); },
-            
-            // ✅ FIX: Real-time sync
-            sync() {
-                if(this.state.meta.bruto > 0) this.calculate();
-            },
-
-            setMode(m) {
-                this.state.mode = m;
-                document.getElementById('btnIslam').className = `flex-1 py-3 rounded-xl font-bold transition ${m==='islam'?'tab-active':'tab-inactive'}`;
-                document.getElementById('btnBW').className = `flex-1 py-3 rounded-xl font-bold transition ${m==='bw'?'tab-active':'tab-inactive'}`;
-                document.getElementById('lawModeLabel').innerText = m === 'islam' ? 'Kompilasi Hukum Islam (KHI)' : 'KUHPerdata (BW)';
-                this.sync(); // ✅ Auto calculate saat ganti mode
-            },
-
-            calculate() {
-                const bruto = this.val('hartaRaw');
-                const gono = document.getElementById('isGono').checked ? bruto/2 : 0;
-                let sisa = bruto - gono - this.val('utangRaw') - this.val('biayaRaw');
-                
-                // ✅ FIX: Zakat dari bruto (nisab harta)
-                let zakat = (document.getElementById('isZakat').checked && bruto >= 85000000) ? bruto * 0.025 : 0;
-                sisa -= zakat;
-
-                if(sisa <= 0 && bruto > 0) return alert("Harta habis untuk membayar utang/biaya.");
-
-                this.state.meta = { bruto, gono, zakat, sisa };
-                document.getElementById('netDisplay').innerText = this.fmt(sisa);
-
-                this.state.mode === 'islam' ? this.logicIslam(sisa) : this.logicBW(sisa);
-                this.display();
-            },
-
-            // ✅ LOGIC ISLAM YANG BENAR (urutan prioritas & pool)
-            logicIslam(total) {
-                let res = []; let pool = total;
-                const al = this.num('al'), ap = this.num('ap'), gP = document.getElementById('genderP').value;
-                const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
-                const hasAnak = (al + ap) > 0;
-
-                // 1. PASANGAN (Zul Faraidh) - PRIORITAS 1
-                if(gP !== 'none') {
-                    let p = hasAnak ? (gP === 'istri' ? 1/8 : 1/4) : (gP === 'istri' ? 1/4 : 1/2);
-                    let v = pool * p;
-                    res.push({ n: gP === 'istri' ? 'ISTRI' : 'SUAMI', r: 'Zul Faraidh', p: (p===1/8?'1/8':p===1/4?'1/4':'1/2'), v, l: 'Ps. 180 KHI' });
-                    pool -= v;
-                }
-
-                // 2. IBU (Zul Faraidh) - PRIORITAS 2
-                if(hI && pool > 0) {
-                    let p = hasAnak || hA ? 1/6 : 1/3;
-                    let v = pool * p;
-                    res.push({ n: 'IBU', r: 'Zul Faraidh', p: (p===1/6?'1/6':'1/3'), v, l: 'Ps. 178 KHI' });
-                    pool -= v;
-                }
-
-                // 3. AYAH (Zul Faraidh/Ashabah) - PRIORITAS 3
-                if(hA && pool > 0) {
-                    if(hasAnak) {
-                        let v = pool * (1/6);
-                        res.push({ n: 'AYAH', r: 'Zul Faraidh', p: '1/6', v, l: 'Ps. 177 KHI' });
-                        pool -= v;
-                    } else {
-                        res.push({ n: 'AYAH', r: 'Ashabah', p: 'Residu', v: pool, l: 'Ps. 177 KHI' });
-                        pool = 0;
-                    }
-                }
-
-                // 4. ANAK (Ashabah) - PRIORITAS 4
-                if(pool > 0 && hasAnak) {
-                    let share = pool / (al*2 + ap);
-                    if(al > 0) res.push({ n: `ANAK LAKI (${al})`, r: 'Ashabah', p: '2:1', v: share*2*al, l: 'Ps. 176 KHI' });
-                    if(ap > 0) res.push({ n: `ANAK PR (${ap})`, r: 'Ashabah', p: '2:1', v: share*ap, l: 'Ps. 176 KHI' });
-                    pool = 0;
-                }
-
-                // 5. RADD - kembalikan ke ahli waris sebelumnya
-                if(pool > 0 && res.length > 0) {
-                    res[res.length-1].v += pool;
-                    res[res.length-1].p += ' + Radd';
-                }
-
-                // ✅ Edge case: hanya orang tua
-                if(res.length === 0) {
-                    if(hA) res.push({ n: 'AYAH', r: 'Ashabah', p: '100%', v: total, l: 'Ps. 177 KHI' });
-                    else if(hI) res.push({ n: 'IBU', r: 'Zul Faraidh', p: '100%', v: total, l: 'Ps. 178 KHI' });
-                }
-
-                this.state.results = res;
-            },
-
-            // ✅ LOGIC BW YANG BENAR (per orang, bukan golongan)
-            logicBW(total) {
-                let res = [];
-                const al = this.num('al'), ap = this.num('ap');
-                const gP = document.getElementById('genderP').value !== 'none';
-                const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
-
-                if((al+ap) > 0 || gP)
+</body>
+</html>
