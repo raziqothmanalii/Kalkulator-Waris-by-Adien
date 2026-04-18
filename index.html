@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Waris by Adien - Beta Edition</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,126 +12,23 @@
 
     <style>
         :root { --primary: #3b82f6; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            overflow-x: hidden; 
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-        .glass-card { 
-            background: var(--card); 
-            border: 1px solid #334155; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); 
-        }
-        .input-dark { 
-            width: 100%; 
-            border: 2px solid #334155; 
-            border-radius: 12px; 
-            padding: 16px 20px; 
-            outline: none; 
-            transition: 0.2s; 
-            background: #0f172a; 
-            color: white;
-            font-size: 16px;
-            -webkit-appearance: none;
-        }
-        .input-dark:focus { 
-            border-color: var(--primary); 
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); 
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); overflow-x: hidden; }
+        .glass-card { background: var(--card); border: 1px solid #334155; border-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+        .input-dark { width: 100%; border: 2px solid #334155; border-radius: 12px; padding: 12px 16px; outline: none; transition: 0.2s; background: #0f172a; color: white; }
+        .input-dark:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
         .tab-active { background: var(--primary); color: white; }
         .tab-inactive { background: #334155; color: #94a3b8; }
-        .btn-prime { 
-            background: var(--primary); 
-            color: white; 
-            font-weight: 800; 
-            padding: 20px 24px; 
-            border-radius: 16px; 
-            width: 100%; 
-            transition: 0.3s; 
-            cursor: pointer; 
-            border: none; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px;
-            font-size: 16px;
-            min-height: 56px;
-            touch-action: manipulation;
-        }
-        .btn-prime:active { transform: scale(0.98); }
-        .res-item { 
-            border-left: 5px solid #334155; 
-            animation: slideIn 0.3s ease forwards; 
-            background: #2d3748; 
-            touch-action: manipulation;
-        }
+        .btn-prime { background: var(--primary); color: white; font-weight: 800; padding: 18px; border-radius: 16px; width: 100%; transition: 0.3s; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .res-item { border-left: 5px solid #334155; animation: slideIn 0.3s ease forwards; background: #2d3748; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         .gol-prio { border-left-color: #10b981; } 
         .gol-ashaba { border-left-color: #f59e0b; } 
         .gol-zero { border-left-color: #ef4444; opacity: 0.6; }
-        #welcomeOverlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(2, 6, 23, 0.95); 
-            backdrop-filter: blur(12px); 
-            z-index: 10000; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 24px; 
-        }
+        #welcomeOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px; }
         
-        .tooltip { 
-            position: relative; 
-            display: inline-block; 
-            cursor: help; 
-            touch-action: manipulation;
-        }
-        .tooltip .tooltiptext { 
-            visibility: hidden; 
-            width: 240px; 
-            background-color: #0f172a; 
-            color: #fff; 
-            text-align: left; 
-            border-radius: 12px; 
-            padding: 12px; 
-            position: absolute; 
-            z-index: 100; 
-            bottom: 125%; 
-            left: 50%; 
-            margin-left: -120px; 
-            opacity: 0; 
-            transition: opacity 0.3s; 
-            border: 1px solid #475569; 
-            font-size: 10px; 
-            font-weight: normal; 
-            line-height: 1.5; 
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); 
-            pointer-events: none;
-        }
-        .tooltip:hover .tooltiptext,
-        .tooltip:active .tooltiptext,
-        .tooltip:focus-within .tooltiptext {
-            visibility: visible; 
-            opacity: 1; 
-        }
-        
-        label { min-height: 44px; display: flex; align-items: center; }
-        select, input[type="checkbox"] { font-size: 16px; -webkit-appearance: none; }
-        .tab-btn { min-height: 48px; padding: 12px 20px !important; font-size: 14px; }
-
-        @media (max-width: 768px) {
-            .input-dark { padding: 20px 24px; font-size: 18px; }
-            .btn-prime { padding: 24px 28px; min-height: 64px; }
-            .tooltip .tooltiptext {
-                position: fixed; width: 90vw; max-width: 320px; left: 5vw; margin-left: 0;
-                bottom: auto; top: 100%; z-index: 10000;
-            }
-        }
+        .tooltip { position: relative; display: inline-block; cursor: help; }
+        .tooltip .tooltiptext { visibility: hidden; width: 240px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 12px; padding: 12px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -120px; opacity: 0; transition: opacity 0.3s; border: 1px solid #475569; font-size: 10px; font-weight: normal; line-height: 1.5; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="dark">
@@ -142,7 +39,7 @@
             <h2 class="text-2xl font-black mb-4 tracking-tight text-white">Kalkulator Waris by Adien</h2>
             <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 mb-6 text-left">
                 <p class="text-xs text-blue-100 leading-relaxed">
-                    Website ini dirancang untuk menghitung estimasi pembagian waris Anda secara akurat sesuai kaidah Hukum Islam & KUH Perdata (BW). Jika Anda menemukan bug, error, atau kesalahan kalkulasi silakan hubungi: <span class="font-bold text-blue-400">raziqothmanalii@gmail.com</span>
+                    Website ini dirancang untuk menghitung estimasi pembagian waris Anda secara akurat sesuai kaidah Hukum Islam & KUH Perdata (BW). Untuk hasil terbaik, disarankan menggunakan komputer/dekstop. Jika Anda menemukan bug, error, atau kesalahan kalkulasi silakan hubungi: <span class="font-bold text-blue-400">raziqothmanalii@gmail.com</span>
                 </p>
             </div>
             <button onclick="document.getElementById('welcomeOverlay').remove()" class="btn-prime w-full uppercase tracking-widest text-xs">Masuk ke Kalkulator</button>
@@ -150,13 +47,13 @@
     </div>
 
     <header class="bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800 py-6 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <h1 class="text-2xl font-black tracking-tighter text-white">Kalkulator Waris <span class="text-blue-500">by Adien</span></h1>
             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-700 px-3 py-1 rounded-full">BETA EDITION</span>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-5 space-y-6">
                 <div class="glass-card p-8">
@@ -167,8 +64,8 @@
                             <input type="text" id="utangRaw" class="input-dark" placeholder="Utang" oninput="AdienFinal.mask(this)">
                             <input type="text" id="biayaRaw" class="input-dark" placeholder="Biaya Wasiat" oninput="AdienFinal.mask(this)">
                         </div>
-                        <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl flex-wrap">
-                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold min-w-[140px]">
+                        <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
+                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
                                 Harta Bersama 
                                 <span class="tooltip ml-1 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px]">
@@ -176,7 +73,7 @@
                                     <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
                                 </span>
                             </label>
-                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold min-w-[100px]">
+                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
                             </label>
                         </div>
@@ -190,8 +87,8 @@
                             ?
                             <span class="tooltiptext">
                                 <b>Dalam perhitungan KUH Perdata:</b><br>
-                                - <b>Golongan I:</b> Merujuk kepada Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
-                                - <b>Golongan II:</b> Merujuk kepada Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.<br><br>
+                                • <b>Golongan I:</b> Merujuk kepada Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
+                                • <b>Golongan II:</b> Merujuk kepada Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.<br><br>
                                 <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
                             </span>
                         </span>
@@ -228,8 +125,8 @@
                             ?
                             <span class="tooltiptext">
                                 <b>Dalam perhitungan KUH Perdata:</b><br>
-                                - <b>Golongan III:</b> Merujuk kepada Kakek, Nenek, dan leluhur ke atas lainnya.<br>
-                                - <b>Golongan IV:</b> Merujuk kepada Paman, Tante, dan keturunannya hingga derajat ke-6.<br><br>
+                                • <b>Golongan III:</b> Merujuk kepada Kakek, Nenek, dan leluhur ke atas lainnya.<br>
+                                • <b>Golongan IV:</b> Merujuk kepada Paman, Tante, dan keturunannya hingga derajat ke-6.<br><br>
                                 <b>Catatan:</b> Jika golongan utama tidak ada, harta dibagi 50:50 antara garis ayah & ibu (kloving) lalu dibagi rata per kepala.<br><br>
                                 <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
                             </span>
@@ -259,11 +156,9 @@
                             <h2 class="text-3xl font-black tracking-tighter text-white">Rincian Pembagian</h2>
                             <p id="netDisplay" class="text-blue-400 text-lg font-bold">Rp 0</p>
                         </div>
-                        <div class="flex bg-[#0f172a] p-1.5 rounded-2xl border border-slate-700 w-full md:w-auto">
-                            <button id="btnIslam" onclick="AdienFinal.setMode('islam')" 
-                                    class="flex-1 md:px-6 py-3 md:py-2.5 rounded-xl text-sm md:text-xs font-black transition tab-active tab-btn">HUKUM ISLAM</button>
-                            <button id="btnBW" onclick="AdienFinal.setMode('bw')" 
-                                    class="flex-1 md:px-6 py-3 md:py-2.5 rounded-xl text-sm md:text-xs font-black transition tab-inactive md:ml-1 tab-btn">KUH PERDATA</button>
+                        <div class="flex bg-[#0f172a] p-1.5 rounded-2xl border border-slate-700">
+                            <button id="btnIslam" onclick="AdienFinal.setMode('islam')" class="px-6 py-2.5 rounded-xl text-xs font-black transition tab-active">HUKUM ISLAM</button>
+                            <button id="btnBW" onclick="AdienFinal.setMode('bw')" class="px-6 py-2.5 rounded-xl text-xs font-black transition tab-inactive ml-1">KUH PERDATA</button>
                         </div>
                     </div>
 
@@ -275,28 +170,16 @@
 
                     <div class="mt-6 flex gap-4">
                         <button onclick="AdienFinal.calculate()" class="btn-prime flex-1 uppercase tracking-widest text-xs">Hitung Ulang</button>
-                        <button onclick="AdienFinal.pdf()" class="px-8 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition py-4 md:py-3 min-h-[56px]">UNDUH PDF</button>
+                        <button onclick="AdienFinal.pdf()" class="px-8 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition">UNDUH PDF</button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+</body>
+</html>
 
     <script>
-        function closeWelcome() {
-            document.getElementById('welcomeOverlay').remove();
-        }
-
-        // Prevent double tap zoom
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-                        lastTouchEnd = now;
-        }, false);
-
         const AdienFinal = {
             state: { mode: 'islam', results: [] },
 
@@ -311,11 +194,9 @@
             fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.round(n)); },
 
             setMode(m) {
-                if ('vibrate' in navigator) navigator.vibrate(50);
-                
                 this.state.mode = m;
-                document.getElementById('btnIslam').className = `flex-1 md:px-6 py-3 md:py-2.5 rounded-xl text-sm md:text-xs font-black transition ${m==='islam'?'tab-active':'tab-inactive'} tab-btn`;
-                document.getElementById('btnBW').className = `flex-1 md:px-6 py-3 md:py-2.5 rounded-xl text-sm md:text-xs font-black transition ${m==='bw'?'tab-active':'tab-inactive'} md:ml-1 tab-btn`;
+                document.getElementById('btnIslam').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='islam'?'tab-active':'tab-inactive'}`;
+                document.getElementById('btnBW').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='bw'?'tab-active':'tab-inactive'} ml-1`;
                 this.calculate();
             },
 
@@ -339,207 +220,204 @@
                 
                 this.display();
             },
-
             logicIslam(netto) {
-                let res = [], pool = netto;
-                
-                // Input values
-                const gP = document.getElementById('genderP').value;
-                const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
-                const pmn = this.num('paman'), tnt = this.num('tante');
-                const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
-                const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
-                
-                // Kondisi penentu
-                const hasKeturunan = (al + ap) > 0;
-                const hasSaudaraBanyak = (sl + sp) >= 2;
-                const hasSaudara = (sl + sp) > 0;
-                const noKeturunanNoAyah = !hasKeturunan && !hA;
-                
-                // Track double portion
-                let ayahDzul = 0, ayahAshab = 0;
-                let apDzul = 0, apAshab = 0;
-                
-                console.log('=== PEMBAGIAN HARTA WARIS ISLAM KHI ===');
-                console.log(`Netto: ${netto}, Pool awal: ${pool}`);
+    let res = [], pool = netto;
+    
+    // Input values
+    const gP = document.getElementById('genderP').value;
+    const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
+    const pmn = this.num('paman'), tnt = this.num('tante');
+    const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
+    const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
+    
+    // Kondisi penentu
+    const hasKeturunan = (al + ap) > 0;
+    const hasSaudaraBanyak = (sl + sp) >= 2;
+    const hasSaudara = (sl + sp) > 0;
+    const noKeturunanNoAyah = !hasKeturunan && !hA;
+    
+    // Track double portion
+    let ayahDzul = 0, ayahAshab = 0;
+    let apDzul = 0, apAshab = 0;
+    
+    console.log('=== PEMBAGIAN HARTA WARIS ISLAM KHI ===');
+    console.log(`Netto: ${netto}, Pool awal: ${pool}`);
 
-                // ================================
-                // A. PASANGAN (PRIORITAS 1) - An-Nisa:12, KHI 179-180
-                // ================================
-                if (gP !== 'none') {
-                    const bagian = hasKeturunan ? (gP === 'istri' ? '1/8' : '1/4') : (gP === 'istri' ? '1/4' : '1/2');
-                    const v = Math.round(netto * eval(bagian));
-                    res.push({ 
-                        n: gP === 'istri' ? 'ISTRI/JANDA' : 'SUAMI/DUDA', 
-                        r: `An-Nisa:12, KHI ${gP === 'istri' ? 180 : 179}`, 
-                        v, count: 1, bagian, type: 'dzul-faraidh'
-                    });
-                    pool -= v;
-                    console.log(`1. ${res[res.length-1].n}: ${v} (${bagian}) | Pool: ${pool}`);
-                }
+    // ================================
+    // A. PASANGAN (PRIORITAS 1) - An-Nisa:12, KHI 179-180
+    // ================================
+    if (gP !== 'none') {
+        const bagian = hasKeturunan ? (gP === 'istri' ? '1/8' : '1/4') : (gP === 'istri' ? '1/4' : '1/2');
+        const v = Math.round(netto * eval(bagian));
+        res.push({ 
+            n: gP === 'istri' ? 'ISTRI/JANDA' : 'SUAMI/DUDA', 
+            r: `An-Nisa:12, KHI ${gP === 'istri' ? 180 : 179}`, 
+            v, count: 1, bagian, type: 'dzul-faraidh'
+        });
+        pool -= v;
+        console.log(`1. ${res[res.length-1].n}: ${v} (${bagian}) | Pool: ${pool}`);
+    }
 
-                // ================================
-                // B1. ANAK PEREMPUAN - An-Nisa:11, KHI 176
-                // ================================
-                if (ap > 0 && al === 0) {
-                    const bagian = ap === 1 ? '1/2' : '2/3';
-                    apDzul = Math.round(netto * eval(bagian));
-                    res.push({ 
-                        n: `ANAK PEREMPUAN (${ap})`, 
-                        r: 'An-Nisa:11, KHI 176', 
-                        v: apDzul, count: ap, bagian, type: 'dzul-faraidh'
-                    });
-                    pool -= apDzul;
-                    console.log(`2. ANAK PEREMPUAN (${ap}): ${apDzul} (${bagian}) | Pool: ${pool}`);
-                }
+    // ================================
+    // B1. ANAK PEREMPUAN - An-Nisa:11, KHI 176
+    // ================================
+    if (ap > 0 && al === 0) {
+        const bagian = ap === 1 ? '1/2' : '2/3';
+        apDzul = Math.round(netto * eval(bagian));
+        res.push({ 
+            n: `ANAK PEREMPUAN (${ap})`, 
+            r: 'An-Nisa:11, KHI 176', 
+            v: apDzul, count: ap, bagian, type: 'dzul-faraidh'
+        });
+        pool -= apDzul;
+        console.log(`2. ANAK PEREMPUAN (${ap}): ${apDzul} (${bagian}) | Pool: ${pool}`);
+    }
 
-                // ================================
-                // B3. AYAH KANDUNG - An-Nisa:11, KHI 177
-                // ================================
-                if (hA) {
-                    const bagian = hasKeturunan ? '1/6' : '1/3';
-                    ayahDzul = Math.round(netto * eval(bagian));
-                    res.push({ 
-                        n: 'AYAH KANDUNG', 
-                        r: `An-Nisa:11, KHI 177 (${bagian})`, 
-                        v: ayahDzul, count: 1, bagian, type: 'dzul-faraidh'
-                    });
-                    pool -= ayahDzul;
-                    console.log(`3. AYAH: ${ayahDzul} (${bagian}) | Pool: ${pool}`);
-                }
+    // ================================
+    // B3. AYAH KANDUNG - An-Nisa:11, KHI 177
+    // ================================
+    if (hA) {
+        const bagian = hasKeturunan ? '1/6' : '1/3';
+        ayahDzul = Math.round(netto * eval(bagian));
+        res.push({ 
+            n: 'AYAH KANDUNG', 
+            r: `An-Nisa:11, KHI 177 (${bagian})`, 
+            v: ayahDzul, count: 1, bagian, type: 'dzul-faraidh'
+        });
+        pool -= ayahDzul;
+        console.log(`3. AYAH: ${ayahDzul} (${bagian}) | Pool: ${pool}`);
+    }
 
-                // ================================
-                // B4. IBU KANDUNG - An-Nisa:11, KHI 178 (3 kondisi)
-                // ================================
-                if (hI) {
-                    let v = 0, dasar = '', bagian = '';
-                    
-                    if (!hasKeturunan && !hasSaudaraBanyak && !hA) {
-                        v = Math.round(netto * 1/3); bagian = '1/3'; dasar = 'sendirian';
-                    } else if ((hasKeturunan || hasSaudaraBanyak) && !hA)
-                                        } else if ((hasKeturunan || hasSaudaraBanyak) && !hA) {
-                        v = Math.round(netto * 1/6); bagian = '1/6'; dasar = 'ada anak/saudara banyak';
-                    } else if (!hasKeturunan && !hasSaudaraBanyak && hA) {
-                        v = Math.round(pool * 1/3); bagian = '1/3 sisa'; dasar = 'bersama Ayah';
-                    }
-                    
-                    res.push({ 
-                        n: 'IBU KANDUNG', 
-                        r: `An-Nisa:11, KHI 178 (${dasar})`, 
-                        v, count: 1, bagian, type: 'dzul-faraidh'
-                    });
-                    pool -= v;
-                    console.log(`4. IBU: ${v} (${bagian}) | Pool: ${pool}`);
-                }
+    // ================================
+    // B4. IBU KANDUNG - An-Nisa:11, KHI 178 (3 kondisi)
+    // ================================
+    if (hI) {
+        let v = 0, dasar = '', bagian = '';
+        
+        if (!hasKeturunan && !hasSaudaraBanyak && !hA) {
+            v = Math.round(netto * 1/3); bagian = '1/3'; dasar = 'sendirian';
+        } else if ((hasKeturunan || hasSaudaraBanyak) && !hA) {
+            v = Math.round(netto * 1/6); bagian = '1/6'; dasar = 'ada anak/saudara banyak';
+        } else if (!hasKeturunan && !hasSaudaraBanyak && hA) {
+            v = Math.round(pool * 1/3); bagian = '1/3 sisa'; dasar = 'bersama Ayah';
+        }
+        
+        res.push({ 
+            n: 'IBU KANDUNG', 
+            r: `An-Nisa:11, KHI 178 (${dasar})`, 
+            v, count: 1, bagian, type: 'dzul-faraidh'
+        });
+        pool -= v;
+        console.log(`4. IBU: ${v} (${bagian}) | Pool: ${pool}`);
+    }
 
-                // ================================
-                // B5. SAUDARA SEIBU - An-Nisa:12, KHI 181
-                // ================================
-                if (noKeturunanNoAyah && hasSaudara) {
-                    const totalSaudaraSeibu = sl + sp;
-                    let v = 0, dasar = '';
-                    
-                    if (totalSaudaraSeibu === 1) {
-                        v = Math.round(netto * 1/6); dasar = '1/6 (sendirian)';
-                    } else if (totalSaudaraSeibu >= 2) {
-                        v = Math.round(netto * 1/3); dasar = '1/3 (2+ orang)';
-                    }
-                    
-                    if (v > 0) {
-                        res.push({ 
-                            n: `SAUDARA SEIBU (${totalSaudaraSeibu})`, 
-                            r: `An-Nisa:12, KHI 181 (${dasar})`, 
-                            v, count: totalSaudaraSeibu, type: 'dzul-faraidh'
-                        });
-                        pool -= v;
-                        console.log(`5. SAUDARA SEIBU: ${v} (${dasar}) | Pool: ${pool}`);
-                    }
-                }
+    // ================================
+    // B5. SAUDARA SEIBU - An-Nisa:12, KHI 181
+    // ================================
+    if (noKeturunanNoAyah && hasSaudara) {
+        const totalSaudaraSeibu = sl + sp;
+        let v = 0, dasar = '';
+        
+        if (totalSaudaraSeibu === 1) {
+            v = Math.round(netto * 1/6); dasar = '1/6 (sendirian)';
+        } else if (totalSaudaraSeibu >= 2) {
+            v = Math.round(netto * 1/3); dasar = '1/3 (2+ orang)';
+        }
+        
+        if (v > 0) {
+            res.push({ 
+                n: `SAUDARA SEIBU (${totalSaudaraSeibu})`, 
+                r: `An-Nisa:12, KHI 181 (${dasar})`, 
+                v, count: totalSaudaraSeibu, type: 'dzul-faraidh'
+            });
+            pool -= v;
+            console.log(`5. SAUDARA SEIBU: ${v} (${dasar}) | Pool: ${pool}`);
+        }
+    }
 
-                // ================================
-                // B6. SAUDARA PEREMPUAN KANDUNG/SEAYAH - An-Nisa:12, KHI 182
-                // ================================
-                if (noKeturunanNoAyah && sp > 0 && sl === 0) {
-                    const bagian = sp === 1 ? '1/2' : '2/3';
-                    const v = Math.round(netto * eval(bagian));
-                    res.push({ 
-                        n: `SAUDARA PEREMPUAN (${sp})`, 
-                        r: `An-Nisa:12, KHI 182 (${bagian})`, 
-                        v, count: sp, type: 'dzul-faraidh'
-                    });
-                    pool -= v;
-                    console.log(`6. SAUDARA PEREMPUAN: ${v} (${bagian}) | Pool: ${pool}`);
-                }
+    // ================================
+    // B6. SAUDARA PEREMPUAN KANDUNG/SEAYAH - An-Nisa:12, KHI 182
+    // ================================
+    if (noKeturunanNoAyah && sp > 0 && sl === 0) {
+        const bagian = sp === 1 ? '1/2' : '2/3';
+        const v = Math.round(netto * eval(bagian));
+        res.push({ 
+            n: `SAUDARA PEREMPUAN (${sp})`, 
+            r: `An-Nisa:12, KHI 182 (${bagian})`, 
+            v, count: sp, type: 'dzul-faraidh'
+        });
+        pool -= v;
+        console.log(`6. SAUDARA PEREMPUAN: ${v} (${bagian}) | Pool: ${pool}`);
+    }
 
-                // ================================
-                // ASHABAH - An-Nisa:11,12 + Hadits 01
-                // ================================
-                if (pool > 0) {
-                    console.log('=== ASHABAH (Sisa Harta) ===');
-                    
-                    if (al > 0) {
-                        const totalShare = al * 2 + ap;
-                        const ratio = pool / totalShare;
-                        const vLaki = Math.round(ratio * 2 * al);
-                        res.push({ n: `ANAK LAKI-LAKI (${al})`, r: 'Ashabah 2:1 (An-Nisa:11)', v: vLaki, count: al, type: 'ashabah' });
-                        
-                        if (ap > 0) {
-                            apAshab = Math.round(ratio * ap);
-                            res.push({ n: `ANAK PEREMPUAN (${ap})`, r: 'Ashabah 2:1 (An-Nisa:11)', v: apAshab, count: ap, type: 'ashabah' });
-                        }
-                        pool = 0;
-                    } else if (hA) {
-                        ayahAshab = pool;
-                        res.push({ n: 'AYAH KANDUNG', r: 'Ashabah (An-Nisa:11)', v: ayahAshab, count: 1, type: 'ashabah' });
-                        pool = 0;
-                    } else if (noKeturunanNoAyah && sl > 0) {
-                        const totalShare = sl * 2 + sp;
-                        const ratio = pool / totalShare;
-                        res.push({ n: `SAUDARA LAKI (${sl})`, r: 'Ashabah 2:1 (An-Nisa:12)', v: Math.round(ratio * 2 * sl), count: sl, type: 'ashabah' });
-                        pool = 0;
-                    }
-                }
+    // ================================
+    // ASHABAH - An-Nisa:11,12 + Hadits 01
+    // ================================
+    if (pool > 0) {
+        console.log('=== ASHABAH (Sisa Harta) ===');
+        
+        if (al > 0) {
+            const totalShare = al * 2 + ap;
+            const ratio = pool / totalShare;
+            const vLaki = Math.round(ratio * 2 * al);
+            res.push({ n: `ANAK LAKI-LAKI (${al})`, r: 'Ashabah 2:1 (An-Nisa:11)', v: vLaki, count: al, type: 'ashabah' });
+            
+            if (ap > 0) {
+                apAshab = Math.round(ratio * ap);
+                res.push({ n: `ANAK PEREMPUAN (${ap})`, r: 'Ashabah 2:1 (An-Nisa:11)', v: apAshab, count: ap, type: 'ashabah' });
+            }
+            pool = 0;
+        } else if (hA) {
+            ayahAshab = pool;
+            res.push({ n: 'AYAH KANDUNG', r: 'Ashabah (An-Nisa:11)', v: ayahAshab, count: 1, type: 'ashabah' });
+            pool = 0;
+        } else if (noKeturunanNoAyah && sl > 0) {
+            const totalShare = sl * 2 + sp;
+            const ratio = pool / totalShare;
+            res.push({ n: `SAUDARA LAKI (${sl})`, r: 'Ashabah 2:1 (An-Nisa:12)', v: Math.round(ratio * 2 * sl), count: sl, type: 'ashabah' });
+            pool = 0;
+        }
+    }
 
-                // ================================
-                // HIJAB HIRMAN - HARUS v=0 & BELUM DAPAT BAGIAN
-                // ================================
-                const hijabCandidates = [];
-                
-                if (hK && (hasKeturunan || hA) && !res.some(r => r.n.includes('KAKEK') && r.v > 0)) {
-                    hijabCandidates.push({ n: 'KAKEK', r: 'Hijab Hirman (Anak/Ayah)', v: 0, count: 1, type: 'hijab' });
-                }
-                if (hN && hI && !res.some(r => r.n.includes('NENEK') && r.v > 0)) {
-                    hijabCandidates.push({ n: 'NENEK', r: 'Hijab Hirman (Ibu)', v: 0, count: 1, type: 'hijab' });
-                }
-                if (hasSaudara && (hasKeturunan || hA) && !res.some(r => r.n.includes('SAUDARA') && r.v > 0)) {
-                    hijabCandidates.push({ n: `SAUDARA (${sl+sp})`, r: 'Hijab Hirman (Anak/Ayah)', v: 0, count: sl+sp, type: 'hijab' });
-                }
-                if ((pmn + tnt > 0) && (hasKeturunan || hA || hI || hasSaudara) && !res.some(r => r.n.includes('PAMAN') && r.v > 0)) {
-                    hijabCandidates.push({ n: `PAMAN/TANTE (${pmn+tnt})`, r: 'Hijab Hirman (Ahli Dekat)', v: 0, count: pmn+tnt, type: 'hijab' });
-                }
-                
-                // Tambahkan hanya jika v=0 BENAR-BENAR
-                hijabCandidates.forEach(item => res.push(item));
+    // ================================
+    // HIJAB HIRMAN - HARUS v=0 & BELUM DAPAT BAGIAN
+    // ================================
+    const hijabCandidates = [];
+    
+    if (hK && (hasKeturunan || hA) && !res.some(r => r.n.includes('KAKEK') && r.v > 0)) {
+        hijabCandidates.push({ n: 'KAKEK', r: 'Hijab Hirman (Anak/Ayah)', v: 0, count: 1, type: 'hijab' });
+    }
+    if (hN && hI && !res.some(r => r.n.includes('NENEK') && r.v > 0)) {
+        hijabCandidates.push({ n: 'NENEK', r: 'Hijab Hirman (Ibu)', v: 0, count: 1, type: 'hijab' });
+    }
+    if (hasSaudara && (hasKeturunan || hA) && !res.some(r => r.n.includes('SAUDARA') && r.v > 0)) {
+        hijabCandidates.push({ n: `SAUDARA (${sl+sp})`, r: 'Hijab Hirman (Anak/Ayah)', v: 0, count: sl+sp, type: 'hijab' });
+    }
+    if ((pmn + tnt > 0) && (hasKeturunan || hA || hI || hasSaudara) && !res.some(r => r.n.includes('PAMAN') && r.v > 0)) {
+        hijabCandidates.push({ n: `PAMAN/TANTE (${pmn+tnt})`, r: 'Hijab Hirman (Ahli Dekat)', v: 0, count: pmn+tnt, type: 'hijab' });
+    }
+    
+    // Tambahkan hanya jika v=0 BENAR-BENAR
+    hijabCandidates.forEach(item => res.push(item));
 
-                // ================================
-                // BAITULMAL
-                // ================================
-                if (pool > 0) {
-                    res.push({ n: 'BAITULMAL', r: 'Sisa Harta (KHI 185)', v: pool, count: 1, type: 'baitulmal' });
-                }
+    // ================================
+    // BAITULMAL
+    // ================================
+    if (pool > 0) {
+        res.push({ n: 'BAITULMAL', r: 'Sisa Harta (KHI 185)', v: pool, count: 1, type: 'baitulmal' });
+    }
 
-                // ================================
-                // AUTO SORT: dzul > ashbah > toolbox > hijab > baitulmal
-                // ================================
-                res.sort((a, b) => {
-                    const priority = { 'dzul-faraidh': 1, 'ashabah': 2, 'toolbox': 3, 'hijab': 4, 'baitulmal': 5 };
-                    return (priority[a.type] || 6) - (priority[b.type] || 6);
-                });
+    // ================================
+    // AUTO SORT: dzul > ashbah > toolbox > hijab > baitulmal
+    // ================================
+    res.sort((a, b) => {
+        const priority = { 'dzul-faraidh': 1, 'ashabah': 2, 'toolbox': 3, 'hijab': 4, 'baitulmal': 5 };
+        return (priority[a.type] || 6) - (priority[b.type] || 6);
+    });
 
-                console.log('=== HASIL FINAL ===', res);
-                this.state.results = res;
-            },
-
+    console.log('=== HASIL FINAL ===', res);
+    this.state.results = res;
+},
             logicBW(netto) {
                 let res = [];
                 const al = this.num('al'), ap = this.num('ap'), gP = document.getElementById('genderP').value !== 'none';
@@ -570,8 +448,7 @@
             },
 
             display() {
-                const box = document.getElementById('results'); 
-                box.innerHTML = '';
+                const box = document.getElementById('results'); box.innerHTML = '';
                 this.state.results.forEach(r => {
                     const pk = r.v > 0 ? Math.round(r.v / r.count) : 0;
                     const isZero = r.v === 0;
@@ -601,15 +478,6 @@
                 doc.save('Estimasi_Waris_Adien.pdf');
             }
         };
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            AdienFinal.calculate();
-            if ('vibrate' in navigator) {
-                // Test vibration on load (optional)
-                setTimeout(() => navigator.vibrate(100), 500);
-            }
-        });
     </script>
 </body>
 </html>
