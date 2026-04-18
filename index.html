@@ -305,10 +305,10 @@
 
                 <!-- Core Family -->
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center">
-                        👥 KELUARGA INTI
-                        <button type="button" class="info-btn ml-2" onclick="showPopup('Keluarga Inti terdiri dari Pasangan, Anak, dan Orang Tua.')">?</button>
-                    </h3>
+                    <div class="flex items-center mb-6">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">👥 KELUARGA INTI</h3>
+                        <button type="button" class="info-btn ml-2" onclick="showPopupKeluargaInti()">?</button>
+                    </div>
                     <div class="space-y-4">
                         <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
                             <option value="none">Pilih Pasangan</option>
@@ -335,12 +335,10 @@
                 </div>
 
                 <!-- Extended Family -->
-                <div class="glass-card p-8 bg-slate-800/20">
+               <div class="glass-card p-8 bg-slate-800/20">
                     <div class="flex items-center mb-6">
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400 flex items-center">
-                            🧬 KELUARGA LAINNYA
-                            <button type="button" class="info-btn ml-2" onclick="showPopup('Jika golongan utama tidak ada, maka menggunakan metode kloving.')">?</button>
-                        </h3>
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400">🧬 KELUARGA LAINNYA</h3>
+                        <button type="button" class="info-btn ml-2" onclick="showPopupKeluargaLainnya()">?</button>
                     </div>
                     <div class="space-y-4">            
                         <div class="grid grid-cols-2 gap-3">
@@ -357,7 +355,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Right Panel - Results -->
             <div class="lg:col-span-7">
@@ -597,11 +594,38 @@
             }
         };
 
-        function showPopup(text) {
-            document.getElementById('modalText').textContent = text;
+       function showPopup(text) {
+            document.getElementById('modalText').innerHTML = text;  // Ganti textContent → innerHTML
             document.getElementById('infoModal').style.display = 'flex';
         }
 
+        function showPopupKeluargaInti() {
+            const text = `
+                <b>Dalam perhitungan KUH Perdata:</b><br><br>
+                - <b>Golongan I:</b> Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
+                - <b>Golongan II:</b> Orang tua (Ayah/Ibu) dan saudara kandung beserta keturunannya.<br><br>
+                <i>*Dalam perhitungan Waris Islam, penggolongan ini diabaikan dan tidak memengaruhi kalkulasi akhir.</i>
+            `;
+            document.getElementById('modalText').innerHTML = text;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function showPopupKeluargaLainnya() {
+            const text = `
+                <b>Dalam perhitungan KUH Perdata:</b><br><br>
+                - <b>Golongan III:</b> Kakek, Nenek, dan leluhur ke atas lainnya.<br>
+                - <b>Golongan IV:</b> Paman, Tante, dan keturunannya hingga derajat ke-6.<br><br>
+                <b>Catatan:</b> Jika golongan utama tidak ada, berlaku sistem 50:50 (kloving) antara keluarga ayah & ibu, lalu dibagi per kepala.<br><br>
+                <i>*Dalam perhitungan Waris Islam, penggolongan ini diabaikan dan tidak memengaruhi kalkulasi akhir.</i>
+            `;
+            document.getElementById('modalText').innerHTML = text;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+    
+    // Initialize ← JANGAN UBAH INI
+    document.addEventListener('DOMContentLoaded', () => {
+        AdienFinal.init();
+    });
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             AdienFinal.init();
