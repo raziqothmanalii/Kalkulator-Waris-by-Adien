@@ -196,52 +196,188 @@
                 
                 this.display();
             },
-
             logicIslam(netto) {
-                let res = [], pool = netto;
-                const gP = document.getElementById('genderP').value;
-                const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
-                const pmn = this.num('paman'), tnt = this.num('tante');
-                const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
-                const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
-                const hasAnak = (al + ap) > 0;
+    let res = [], pool = netto;
+    const gP = document.getElementById('genderP').value;
+    const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
+    const pmn = this.num('paman'), tnt = this.num('tante');
+    const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
+    const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
+    
+    const hasKeturunan = (al + ap) > 0;
+    const hasSaudaraBanyak = (sl + sp) >= 2;
+    const hasSaudaraSeibu = true; // Asumsi input sl/sp adalah saudara kandung/seayah
+    
+    // ================================
+    // 1. PASANGAN (PRIORITAS 1) - An-Nisa:12
+    // ================================
+    if (gP !== 'none') {
+        let f = hasKeturunan ? (gP === 'istri' ? 1/8 : 1/4) : (gP === 'istri' ? 1/4 : 1/2);
+        let v = Math.round(netto * f);
+        res.push({ n: gP.toUpperCase(), r: 'Dzul Faraidh (An-Nisa:12)', v, count: 1 });
+        pool -= v;
+    }
 
-                if (gP !== 'none') {
-                    let f = hasAnak ? (gP === 'istri' ? 1/8 : 1/4) : (gP === 'istri' ? 1/4 : 1/2);
-                    let v = Math.round(netto * f); res.push({ n: gP.toUpperCase(), r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
-                }
-                if (hI) {
-                    let f = (hasAnak || (sl+sp) > 1) ? 1/6 : 1/3;
-                    let v = Math.round(netto * f); res.push({ n: 'IBU', r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
-                }
-                if (hA && hasAnak) {
-                    let v = Math.round(netto * 1/6); res.push({ n: 'AYAH', r: 'Dzul Faraidh', v, count: 1 }); pool -= v;
-                }
+    // ================================
+    // 2. ANAK PEREMPUAN (PRIORITAS 2) - An-Nisa:11
+    // ================================
+    if (ap > 0 && !al) { // Hanya jika TIDAK ada anak laki-laki
+        let f = (ap === 1) ? 1/2 : 2/3;
+        let v = Math.round(netto * f);
+        res.push({ n: 'ANAK PEREMPUAN', r: 'Dzul Faraidh (An-Nisa:11)', v, count: ap });
+        pool -= v;
+    }
 
-                if (pool > 0) {
-                    if (hasAnak) {
-                        let ratio = pool / (al * 2 + ap);
-                        if (al > 0) res.push({ n: 'ANAK LAKI-LAKI', r: 'Ashabah', v: Math.round(ratio * 2 * al), count: al });
-                        if (ap > 0) res.push({ n: 'ANAK PEREMPUAN', r: 'Ashabah', v: Math.round(ratio * ap), count: ap });
-                        pool = 0;
-                    } else if (hA) {
-                        res.push({ n: 'AYAH', r: 'Ashabah (Sisa)', v: pool, count: 1 }); pool = 0;
-                    } else if (sl + sp > 0) {
-                        let ratio = pool / (sl * 2 + sp);
-                        if (sl > 0) res.push({ n: 'SDR LAKI-LAKI', r: 'Ashabah', v: Math.round(ratio * 2 * sl), count: sl });
-                        if (sp > 0) res.push({ n: 'SDR PEREMPUAN', r: 'Ashabah', v: Math.round(ratio * sp), count: sp });
-                        pool = 0;
-                    }
-                }
+    // ================================
+    // 3. IBU KANDUNG - An-Nisa:11, KHI 178
+    // ================================
+    if (hI) {
+        let v = 0;
+        
+        if (hasKeturunan || hasSaudaraBanyak) {
+            // Ada anak/cucu ATAU 2+ saudara: 1/6
+            v = Math.round(netto * 1/6);
+        } else if (!hasKeturunan && !hasSaudaraBanyak) {
+            if (hA) {
+                // Bersama Ayah Kandung (tanpa anak/saudara banyak): 1/3 dari sisa
+                v = Math.round(pool * 1/3);
+            } else {
+                // Sendirian: 1/3
+                v = Math.round(netto * 1/3);
+            }
+        }
+        
+        res.push({ n: 'IBU KANDUNG', r: 'Dzul Faraidh (An-Nisa:11)', v, count: 1 });
+        pool -= v;
+    }
 
-                if (hK && !res.some(x => x.n === 'KAKEK')) res.push({ n: 'KAKEK', r: 'Hijab Hirman', v: 0, count: 1 });
-                if (hN && !res.some(x => x.n === 'NENEK')) res.push({ n: 'NENEK', r: 'Hijab Hirman', v: 0, count: 1 });
-                if (sl+sp > 0 && !res.some(x => x.n.includes('SDR'))) res.push({ n: 'SAUDARA/I', r: 'Hijab Hirman', v: 0, count: (sl+sp) });
-                if (pmn+tnt > 0) res.push({ n: 'PAMAN/TANTE', r: 'Hijab Hirman', v: 0, count: (pmn+tnt) });
+    // ================================
+    // 4. AYAH KANDUNG - An-Nisa:11, KHI 177
+    // ================================
+    if (hA) {
+        let v = 0;
+        if (hasKeturunan) {
+            // Ada anak/cucu: 1/6
+            v = Math.round(netto * 1/6);
+        } else {
+            // Tidak ada anak/cucu: 1/3 (fix portion)
+            v = Math.round(netto * 1/3);
+        }
+        res.push({ n: 'AYAH KANDUNG', r: 'Dzul Faraidh (An-Nisa:11)', v, count: 1 });
+        pool -= v;
+    }
 
-                this.state.results = res;
-            },
+    // ================================
+    // 5. SAUDARA SEIBU (PRIORITAS 3) - An-Nisa:12, KHI 181
+    // ================================
+    if (!hasKeturunan && !hA && (sl + sp > 0)) {
+        if (sl + sp === 1) {
+            // Sendirian: 1/6
+            let v = Math.round(netto * 1/6);
+            res.push({ n: 'SAUDARA SEIBU', r: 'Dzul Faraidh (An-Nisa:12)', v, count: 1 });
+            pool -= v;
+        } else if (sl + sp >= 2) {
+            // 2 orang atau lebih: 1/3
+            let v = Math.round(netto * 1/3);
+            res.push({ n: 'SAUDARA SEIBU', r: 'Dzul Faraidh (An-Nisa:12)', v, count: sl + sp });
+            pool -= v;
+        }
+    }
 
+    // ================================
+    // 6. SAUDARA KANDUNG/SEAYAH (PRIORITAS 4) - An-Nisa:12, KHI 182
+    // ================================
+    if (!hasKeturunan && !hA && (sl + sp > 0)) {
+        if (sp > 0 && sl === 0) { // Hanya saudara perempuan
+            let f = (sp === 1) ? 1/2 : 2/3;
+            let v = Math.round(netto * f);
+            res.push({ n: 'SAUDARA PEREMPUAN KANDUNG', r: 'Dzul Faraidh (An-Nisa:12)', v, count: sp });
+            pool -= v;
+        }
+    }
+
+    // ================================
+    // 7. ASHABAH (SISA HARTA) - Prioritas 5
+    // ================================
+    if (pool > 0) {
+        // Prioritas Ashabah: 1. Anak Laki, 2. Ayah, 3. Saudara Laki, 4. Kakek, 5. Paman
+        if (al > 0) {
+            // Anak Laki-laki + Anak Perempuan (2:1)
+            let totalShare = al * 2 + ap;
+            let ratio = pool / totalShare;
+            res.push({ 
+                n: 'ANAK LAKI-LAKI', 
+                r: 'Ashabah (An-Nisa:11)', 
+                v: Math.round(ratio * 2 * al), 
+                count: al 
+            });
+            if (ap > 0) {
+                res.push({ 
+                    n: 'ANAK PEREMPUAN', 
+                    r: 'Ashabah (An-Nisa:11)', 
+                    v: Math.round(ratio * ap), 
+                    count: ap 
+                });
+            }
+            pool = 0;
+        } else if (hA) {
+            // Ayah ambil sisa
+            res.push({ n: 'AYAH KANDUNG', r: 'Ashabah', v: pool, count: 1 });
+            pool = 0;
+        } else if (sl > 0) {
+            // Saudara Laki-laki ambil sisa (2:1 dengan saudara perempuan)
+            let totalShare = sl * 2 + sp;
+            let ratio = pool / totalShare;
+            res.push({ 
+                n: 'SAUDARA LAKI-LAKI', 
+                r: 'Ashabah (An-Nisa:12)', 
+                v: Math.round(ratio * 2 * sl), 
+                count: sl 
+            });
+            if (sp > 0) {
+                res.push({ 
+                    n: 'SAUDARA PEREMPUAN', 
+                    r: 'Ashabah (An-Nisa:12)', 
+                    v: Math.round(ratio * sp), 
+                    count: sp 
+                });
+            }
+            pool = 0;
+        }
+    }
+
+    // ================================
+    // 8. HIJAB HIRMAN (TERHALANG)
+    // ================================
+    const addHijab = (name, reason, count) => {
+        if (!res.some(x => x.n.includes(name))) {
+            res.push({ n: `${name} (${count})`, r: `Hijab Hirman: ${reason}`, v: 0, count });
+        }
+    };
+
+    // Kakek terhalang oleh Anak/Ayah
+    if (hK && (hasKeturunan || hA)) addHijab('KAKEK', 'Anak/Ayah', 1);
+    
+    // Nenek terhalang oleh Ibu
+    if (hN && hI) addHijab('NENEK', 'Ibu Kandung', 1);
+    
+    // Saudara terhalang oleh Anak/Ayah
+    if ((sl + sp > 0) && (hasKeturunan || hA)) {
+        addHijab('SAUDARA', 'Anak/Ayah', sl + sp);
+    }
+    
+    // Paman/Tante terhalang oleh ahli waris lebih dekat
+    if (pmn + tnt > 0 && (hasKeturunan || hA || hI || (sl + sp > 0))) {
+        addHijab('PAMAN/TANTE', 'Ahli Waris Dekat', pmn + tnt);
+    }
+
+    // Jika masih ada sisa → Baitulmal
+    if (pool > 0) {
+        res.push({ n: 'BAITULMAL', r: 'Sisa Harta (KHI 185)', v: pool, count: 1 });
+    }
+
+    this.state.results = res;
+},
             logicBW(netto) {
                 let res = [];
                 const al = this.num('al'), ap = this.num('ap'), gP = document.getElementById('genderP').value !== 'none';
