@@ -395,144 +395,32 @@
     this.state.results = res;
 },
             logicBW(netto) {
-    let res = [];
-    
-    // Input values - PERBAIKAN BUG!
-    const gP = document.getElementById('genderP').value !== 'none'; // ✅ Boolean: ada/tidak ada pasangan
-    const al = this.num('al'), ap = this.num('ap');
-    const sl = this.num('sl'), sp = this.num('sp');
-    const hI = document.getElementById('hasIbu').checked;
-    const hA = document.getElementById('hasAyah').checked;
-    const hK = document.getElementById('hasKakek').checked;
-    const hN = document.getElementById('hasNenek').checked;
-    const pmn = this.num('paman'), tnt = this.num('tante');
+                let res = [];
+                const al = this.num('al'), ap = this.num('ap'), gP = document.getElementById('genderP').value !== 'none';
+                const sl = this.num('sl'), sp = this.num('sp'), hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
+                const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
+                const pmn = this.num('paman'), tnt = this.num('tante');
 
-    console.log('=== PEMBAGIAN WARIS KUHPERDATA (BW) ===');
-    console.log(`Netto: ${netto.toLocaleString()}`);
-
-    // ================================
-    // GOL I: Suami/Istri + Anak (Ps 832 BW)
-    // ================================
-    if (gP || al > 0 || ap > 0) {
-        const countGol1 = (gP ? 1 : 0) + al + ap;
-        res.push({ 
-            n: `GOLONGAN I (${countGol1})`, 
-            r: 'Suami/Istri + Anak - Sama rata (Ps 832 BW)', 
-            v: netto, 
-            count: countGol1 
-        });
-        
-        // Gol selanjutnya TERHALANG
-        const countGol2 = sl + sp + (hI ? 1 : 0) + (hA ? 1 : 0);
-        if (countGol2 > 0) res.push({ n: `GOL II (${countGol2})`, r: 'Tertutup Gol I', v: 0, count: countGol2 });
-        
-        const countGol3 = (hK ? 1 : 0) + (hN ? 1 : 0);
-        if (countGol3 > 0) res.push({ n: `GOL III (${countGol3})`, r: 'Tertutup Gol I (Ps 853)', v: 0, count: countGol3 });
-        
-        const countGol4 = pmn + tnt;
-        if (countGol4 > 0) res.push({ n: `GOL IV (${countGol4})`, r: 'Tertutup Gol I (Ps 858)', v: 0, count: countGol4 });
-    }
-    
-    // ================================
-    // GOL II: Orang Tua + Saudara (Ps 841-852)
-    // ================================
-    else if (hI || hA || sl > 0 || sp > 0) {
-        const countOrtu = (hI ? 1 : 0) + (hA ? 1 : 0);
-        const countSaudara = sl + sp;
-        const totalGol2 = countOrtu + countSaudara;
-        
-        if (countOrtu > 0) {
-            // Skenario 1: Orang tua hidup
-            let bagianOrtu = countSaudara === 1 ? '1/3' : 
-                           (countSaudara === 2 ? '1/3' : 
-                           (countSaudara > 2 ? '1/4' : '1/2'));
-            
-            res.push({ 
-                n: `GOL II - ORANG TUA (${countOrtu})`, 
-                r: `Bagian tetap ${bagianOrtu} (Ps 841 BW)`, 
-                v: 0, // Detail hitung terpisah
-                count: countOrtu 
-            });
-            
-            if (countSaudara > 0) {
-                res.push({ 
-                    n: `SAUDARA (${countSaudara})`, 
-                    r: 'Sisa setelah orang tua - sama rata', 
-                    v: netto, 
-                    count: countSaudara 
-                });
-            }
-        } else {
-            // Skenario 2: Orang tua meninggal
-            res.push({ 
-                n: `GOL II - SAUDARA (${totalGol2})`, 
-                r: 'Sama rata (Ps 852 BW)', 
-                v: netto, 
-                count: totalGol2 
-            });
-        }
-        
-        // Gol III & IV tertutup
-        const countGol3 = (hK ? 1 : 0) + (hN ? 1 : 0);
-        if (countGol3 > 0) res.push({ n: `GOL III (${countGol3})`, r: 'Tertutup Gol II', v: 0, count: countGol3 });
-        
-        const countGol4 = pmn + tnt;
-        if (countGol4 > 0) res.push({ n: `GOL IV (${countGol4})`, r: 'Tertutup Gol II', v: 0, count: countGol4 });
-    }
-    
-    // ================================
-    // GOL III: Kakek/Nenek (Ps 853 BW)
-    // ================================
-    else if (hK || hN) {
-        const countGol3 = (hK ? 1 : 0) + (hN ? 1 : 0);
-        res.push({ 
-            n: `GOL III - KAKEK/NENEK (${countGol3})`, 
-            r: 'Kloveing 1/2+1/2 (Ps 850 BW) - sama rata', 
-            v: netto, 
-            count: countGol3 
-        });
-        
-        const countGol4 = pmn + tnt;
-        if (countGol4 > 0) res.push({ n: `GOL IV (${countGol4})`, r: 'Tertutup Gol III', v: 0, count: countGol4 });
-    }
-    
-    // ================================
-    // GOL IV: Paman/Tante (Ps 858 BW)
-    // ================================
-    else if (pmn + tnt > 0) {
-        res.push({ 
-            n: `GOL IV - PAMAN/TANTE (${pmn + tnt})`, 
-            r: 'Kloveing 1/2+1/2 (Ps 850 BW) - sama rata', 
-            v: netto, 
-            count: pmn + tnt 
-        });
-    }
-    
-    // ================================
-    // TIDAK ADA AHLi WARIS
-    // ================================
-    else {
-        res.push({ n: 'NEGARA', r: 'Tidak ada ahli waris (Ps 957 BW)', v: netto, count: 1 });
-    }
-
-    // ================================
-    // INFO TAMBAHAN
-    // ================================
-    res.push({ 
-        n: 'ℹ️ PENGGANTIAN TEMPAT', 
-        r: 'Ps 841 BW: Cucu mengganti orang tua (3 kelompok)', 
-        v: 0, count: 0 
-    });
-    
-    res.push({ 
-        n: 'ℹ️ ANAK LUAR KAWIN', 
-        r: '1/3 anak sah atau 3/4 tanpa ahli sah', 
-        v: 0, count: 0 
-    });
-
-    console.log('=== HASIL FINAL BW ===', res);
-    this.state.results = res;
-}
+                if (al + ap + gP > 0) {
+                    const c = al + ap + (gP ? 1 : 0);
+                    res.push({ n: 'GOLONGAN I', r: 'Ahli Waris Utama', v: netto, count: c });
+                    if (sl+sp+hI+hA > 0) res.push({ n: 'GOLONGAN II', r: 'Tertutup Prinsip Derajat', v: 0, count: (sl+sp+(hI?1:0)+(hA?1:0)) });
+                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Prinsip Derajat', v: 0, count: (hK?1:0)+(hN?1:0) });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Prinsip Derajat', v: 0, count: pmn+tnt });
+                } else if (sl + sp + hI + hA > 0) {
+                    const c = sl + sp + (hI ? 1 : 0) + (hA ? 1 : 0);
+                    res.push({ n: 'GOLONGAN II', r: 'Ahli Waris Utama', v: netto, count: c });
+                    if (hK || hN) res.push({ n: 'GOLONGAN III', r: 'Tertutup Prinsip Derajat', v: 0, count: (hK?1:0)+(hN?1:0) });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Prinsip Derajat', v: 0, count: pmn+tnt });
+                } else if (hK || hN) {
+                    const c = (hK?1:0)+(hN?1:0);
+                    res.push({ n: 'GOLONGAN III', r: 'Ahli Waris Utama', v: netto, count: c });
+                    if (pmn+tnt > 0) res.push({ n: 'GOLONGAN IV', r: 'Tertutup Prinsip Derajat', v: 0, count: pmn+tnt });
+                } else if (pmn + tnt > 0) {
+                    const c = pmn + tnt;
+                    res.push({ n: 'GOLONGAN IV', r: 'Ahli Waris Utama', v: netto, count: c });
+                }
+                this.state.results = res;
             },
 
             display() {
