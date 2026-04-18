@@ -11,174 +11,339 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
     <style>
-        :root { --primary: #3b82f6; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: var(--text); overflow-x: hidden; }
-        .glass-card { background: var(--card); border: 1px solid #334155; border-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
-        .input-dark { width: 100%; border: 2px solid #334155; border-radius: 12px; padding: 12px 16px; outline: none; transition: 0.2s; background: #0f172a; color: white; }
-        .input-dark:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
-        .tab-active { background: var(--primary); color: white; }
-        .tab-inactive { background: #334155; color: #94a3b8; }
-        .btn-prime { background: var(--primary); color: white; font-weight: 800; padding: 18px; border-radius: 16px; width: 100%; transition: 0.3s; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .res-item { border-left: 5px solid #334155; animation: slideIn 0.3s ease forwards; background: #2d3748; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        .gol-prio { border-left-color: #10b981; } 
-        .gol-ashaba { border-left-color: #f59e0b; } 
-        .gol-zero { border-left-color: #ef4444; opacity: 0.6; }
-        #welcomeOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        :root { 
+            --primary: #3b82f6; 
+            --bg: #020617; /* Lebih gelap sesuai tema pajak */
+            --card: #0f172a; 
+            --text: #f1f5f9; 
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --danger: #ef4444;
+        }
         
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            overflow-x: hidden; 
+        }
+
+        .glass-card { 
+            background: var(--card); 
+            border: 1px solid #1e293b; 
+            border-radius: 28px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+        }
+
+        .input-dark { 
+            width: 100%; 
+            border: 2px solid #1e293b; 
+            border-radius: 16px; 
+            padding: 14px 20px; 
+            outline: none; 
+            transition: 0.3s; 
+            background: #020617; 
+            color: white; 
+            font-weight: 600;
+        }
+
+        .input-dark:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); 
+        }
+
+        .tab-active { 
+            background: var(--primary); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .tab-inactive { 
+            background: #1e293b; 
+            color: #64748b; 
+        }
+
+        .btn-prime { 
+            background: var(--primary); 
+            color: white; 
+            font-weight: 800; 
+            padding: 20px; 
+            border-radius: 20px; 
+            width: 100%; 
+            transition: 0.3s; 
+            cursor: pointer; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-prime:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+        }
+
+        .res-item { 
+            border-left: 6px solid #1e293b; 
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+            background: #111827; 
+            border-radius: 18px;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .gol-prio { border-left-color: var(--accent-green); } 
+        .gol-ashaba { border-left-color: var(--accent-amber); } 
+        .gol-zero { border-left-color: var(--danger); opacity: 0.5; }
+
         .tooltip { position: relative; display: inline-block; cursor: help; }
-        .tooltip .tooltiptext { visibility: hidden; width: 240px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 12px; padding: 12px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -120px; opacity: 0; transition: opacity 0.3s; border: 1px solid #475569; font-size: 10px; font-weight: normal; line-height: 1.5; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); }
+        .tooltip .tooltiptext { 
+            visibility: hidden; 
+            width: 260px; 
+            background-color: #1e293b; 
+            color: #fff; 
+            text-align: left; 
+            border-radius: 16px; 
+            padding: 16px; 
+            position: absolute; 
+            z-index: 100; 
+            bottom: 130%; 
+            left: 50%; 
+            margin-left: -130px; 
+            opacity: 0; 
+            transition: 0.3s; 
+            border: 1px solid #334155; 
+            font-size: 11px; 
+            font-weight: 500; 
+            line-height: 1.6; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); 
+        }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="dark">
 
-    <div id="welcomeOverlay">
-        <div class="bg-[#1e293b] max-w-lg w-full rounded-[32px] p-8 md:p-12 text-center border border-slate-700 shadow-2xl">
-            <div class="w-20 h-20 bg-blue-900/30 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl border border-blue-500/20">🏛️</div>
-            <h2 class="text-2xl font-black mb-4 tracking-tight text-white">Kalkulator Waris by Adien</h2>
-            <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 mb-6 text-left">
-                <p class="text-xs text-blue-100 leading-relaxed">
-                    Website ini dirancang untuk menghitung estimasi pembagian waris Anda secara akurat sesuai kaidah Hukum Islam & KUH Perdata (BW). Jika Anda menemukan bug, error, atau kesalahan kalkulasi silakan hubungi: <span class="font-bold text-blue-400">raziqothmanalii@gmail.com</span>
+    <div id="welcomeOverlay" style="position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); backdrop-filter: blur(20px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px;">
+        <div class="bg-[#0f172a] max-w-lg w-full rounded-[40px] p-10 md:p-14 text-center border border-slate-800 shadow-2xl">
+            <div class="w-24 h-24 bg-blue-600/10 text-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-8 text-4xl border border-blue-500/20 rotate-3">🏛️</div>
+            <h2 class="text-3xl font-black mb-4 tracking-tighter text-white">Kalkulator Waris <br><span class="text-blue-500">by Adien</span></h2>
+            <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 mb-8 text-left">
+                <p class="text-xs text-slate-400 leading-relaxed font-semibold">
+                    Simulasi perhitungan estimasi waris sesuai kaidah <span class="text-white">Hukum Islam (KHI)</span> & <span class="text-white">KUH Perdata (BW)</span>. Perhitungan akhir dilakukan secara proporsional per kepala.
                 </p>
             </div>
-            <button onclick="document.getElementById('welcomeOverlay').remove()" class="btn-prime w-full uppercase tracking-widest text-xs">Masuk ke Kalkulator</button>
+            <button onclick="document.getElementById('welcomeOverlay').remove()" class="btn-prime">Mulai Perhitungan</button>
         </div>
     </div>
 
-    <header class="bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800 py-6 sticky top-0 z-50">
+    <header class="bg-[#020617]/80 backdrop-blur-xl border-b border-slate-900 py-6 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-            <h1 class="text-2xl font-black tracking-tighter text-white">Kalkulator Waris <span class="text-blue-500">by Adien</span></h1>
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-700 px-3 py-1 rounded-full">BETA EDITION</span>
+            <h1 class="text-2xl font-black tracking-tighter text-white">Adien<span class="text-blue-500">Waris.</span></h1>
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] font-black text-blue-500 bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-500/20 uppercase tracking-widest">Beta Edition</span>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-5 space-y-6">
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            
+            <div class="lg:col-span-5 space-y-8">
+                
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">💰 DATA ASET</h3>
-                    <div class="space-y-4">
-                        <input type="text" id="hartaRaw" class="input-dark" placeholder="Total Harta Bruto" oninput="AdienFinal.mask(this)">
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="utangRaw" class="input-dark" placeholder="Utang" oninput="AdienFinal.mask(this)">
-                            <input type="text" id="biayaRaw" class="input-dark" placeholder="Biaya Wasiat" oninput="AdienFinal.mask(this)">
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">01. Data Aset & Finansial</h3>
+                        <span class="text-blue-500">💰</span>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Total Harta Bruto</label>
+                            <input type="text" id="hartaRaw" class="input-dark" placeholder="Rp 0" oninput="AdienFinal.mask(this)">
                         </div>
-                        <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
-                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
-                                Harta Bersama 
-                                <span class="tooltip ml-1 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px]">
-                                    ?
-                                    <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
-                                </span>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Total Utang</label>
+                                <input type="text" id="utangRaw" class="input-dark" placeholder="Utang" oninput="AdienFinal.mask(this)">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Wasiat/Hibah</label>
+                                <input type="text" id="biayaRaw" class="input-dark" placeholder="Biaya" oninput="AdienFinal.mask(this)">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <label class="flex items-center gap-3 p-4 bg-[#020617] rounded-2xl border border-slate-800 cursor-pointer hover:border-blue-500/50 transition">
+                                <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()" class="accent-blue-500">
+                                <span class="text-[11px] font-black uppercase">Harta Bersama</span>
                             </label>
-                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
+                            <label class="flex items-center gap-3 p-4 bg-[#020617] rounded-2xl border border-slate-800 cursor-pointer hover:border-blue-500/50 transition">
+                                <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()" class="accent-blue-500">
+                                <span class="text-[11px] font-black uppercase">Zakat (2.5%)</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
                 <div class="glass-card p-8">
-                    <div class="flex items-center mb-6">
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">👥 KELUARGA INTI</h3>
-                        <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
-                            ?
-                            <span class="tooltiptext">
-                                <b>Dalam perhitungan KUH Perdata:</b><br>
-                                • <b>Golongan I:</b> Merujuk kepada Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
-                                • <b>Golongan II:</b> Merujuk kepada Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.<br><br>
-                                <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
-                            </span>
-                        </span>
+                    <div class="flex items-center justify-between mb-8">
+                        <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">02. Komposisi Keluarga</h3>
+                        <div class="tooltip">
+                            <span class="w-6 h-6 flex items-center justify-center bg-slate-800 text-slate-400 rounded-full text-[10px] font-black">?</span>
+                            <span class="tooltiptext">Tentukan anggota keluarga yang masih hidup saat ini untuk menentukan prioritas golongan waris.</span>
+                        </div>
                     </div>
-                    <div class="space-y-4">
-                        <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
-                            <option value="none">Pilih Pasangan</option>
-                            <option value="istri">Istri</option>
-                            <option value="suami">Suami</option>
-                        </select>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="al" class="input-dark" placeholder="Jml Anak Laki" oninput="AdienFinal.calculate()">
-                            <input type="number" id="ap" class="input-dark" placeholder="Jml Anak Per" oninput="AdienFinal.calculate()">
+                    <div class="space-y-5">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status Pasangan</label>
+                            <select id="genderP" class="input-dark appearance-none" onchange="AdienFinal.calculate()">
+                                <option value="none">TIDAK ADA PASANGAN</option>
+                                <option value="istri">ISTRI (JANDA)</option>
+                                <option value="suami">SUAMI (DUDA)</option>
+                            </select>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="hasIbu" onchange="AdienFinal.calculate()"> Ada Ibu
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Anak Laki-Laki</label>
+                                <input type="number" id="al" class="input-dark" placeholder="0" oninput="AdienFinal.calculate()">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Anak Perempuan</label>
+                                <input type="number" id="ap" class="input-dark" placeholder="0" oninput="AdienFinal.calculate()">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="flex items-center gap-3 p-4 bg-[#020617] rounded-2xl border border-slate-800 cursor-pointer">
+                                <input type="checkbox" id="hasIbu" onchange="AdienFinal.calculate()" class="accent-blue-500">
+                                <span class="text-[11px] font-black uppercase">Ibu Masih Ada</span>
                             </label>
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="hasAyah" onchange="AdienFinal.calculate()"> Ada Ayah
+                            <label class="flex items-center gap-3 p-4 bg-[#020617] rounded-2xl border border-slate-800 cursor-pointer">
+                                <input type="checkbox" id="hasAyah" onchange="AdienFinal.calculate()" class="accent-blue-500">
+                                <span class="text-[11px] font-black uppercase">Ayah Masih Ada</span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="sl" class="input-dark" placeholder="Sdr Laki-laki" oninput="AdienFinal.calculate()">
-                            <input type="number" id="sp" class="input-dark" placeholder="Sdr Perempuan" oninput="AdienFinal.calculate()">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Saudara Laki</label>
+                                <input type="number" id="sl" class="input-dark" placeholder="0" oninput="AdienFinal.calculate()">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Saudara Per</label>
+                                <input type="number" id="sp" class="input-dark" placeholder="0" oninput="AdienFinal.calculate()">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="glass-card p-8 bg-slate-800/20">
-                    <div class="flex items-center mb-6">
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400">🧬 KELUARGA LAINNYA</h3>
-                        <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
-                            ?
-                            <span class="tooltiptext">
-                                <b>Dalam perhitungan KUH Perdata:</b><br>
-                                • <b>Golongan III:</b> Merujuk kepada Kakek, Nenek, dan leluhur ke atas lainnya.<br>
-                                • <b>Golongan IV:</b> Merujuk kepada Paman, Tante, dan keturunannya hingga derajat ke-6.<br><br>
-                                <b>Catatan:</b> Jika Keluarga Inti (Golongan I dan II) tidak ada, harta dibagi 50:50 antara garis ayah & ibu (kloving) lalu dibagi rata per kepala.<br><br>
-                                <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
-                            </span>
-                        </span>
-                    </div>
+                <div class="glass-card p-8 opacity-80">
+                    <h3 class="text-[11px] font-black text-blue-500 uppercase tracking-[0.2em] mb-8">03. Keluarga Lainnya (GOL III/IV)</h3>
                     <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="hasKakek" onchange="AdienFinal.calculate()"> Ada Kakek
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="flex items-center gap-3 p-3 bg-[#020617] rounded-xl border border-slate-800 cursor-pointer">
+                                <input type="checkbox" id="hasKakek" onchange="AdienFinal.calculate()" class="accent-blue-500">
+                                <span class="text-[10px] font-black uppercase">Kakek</span>
                             </label>
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
-                                <input type="checkbox" id="hasNenek" onchange="AdienFinal.calculate()"> Ada Nenek
+                            <label class="flex items-center gap-3 p-3 bg-[#020617] rounded-xl border border-slate-800 cursor-pointer">
+                                <input type="checkbox" id="hasNenek" onchange="AdienFinal.calculate()" class="accent-blue-500">
+                                <span class="text-[10px] font-black uppercase">Nenek</span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="paman" class="input-dark" placeholder="Jml Paman" oninput="AdienFinal.calculate()">
-                            <input type="number" id="tante" class="input-dark" placeholder="Jml Tante" oninput="AdienFinal.calculate()">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" id="paman" class="input-dark !py-3" placeholder="Jml Paman" oninput="AdienFinal.calculate()">
+                            <input type="number" id="tante" class="input-dark !py-3" placeholder="Jml Tante" oninput="AdienFinal.calculate()">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="lg:col-span-7">
-                <div class="glass-card p-8 sticky top-28 border-t-8 border-blue-500">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div class="glass-card p-10 sticky top-32 border-t-8 border-blue-500 shadow-blue-900/10">
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                         <div>
-                            <h2 class="text-3xl font-black tracking-tighter text-white">Rincian Pembagian</h2>
-                            <p id="netDisplay" class="text-blue-400 text-lg font-bold">Rp 0</p>
+                            <h2 class="text-4xl font-black tracking-tighter text-white">Rincian <br>Distribusi.</h2>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                <p id="netDisplay" class="text-blue-500 text-xl font-black font-mono tracking-tight">Rp 0</p>
+                            </div>
                         </div>
-                        <div class="flex bg-[#0f172a] p-1.5 rounded-2xl border border-slate-700">
-                            <button id="btnIslam" onclick="AdienFinal.setMode('islam')" class="px-6 py-2.5 rounded-xl text-xs font-black transition tab-active">HUKUM ISLAM</button>
-                            <button id="btnBW" onclick="AdienFinal.setMode('bw')" class="px-6 py-2.5 rounded-xl text-xs font-black transition tab-inactive ml-1">KUH PERDATA</button>
+                        <div class="flex bg-[#020617] p-2 rounded-2xl border border-slate-800 shadow-inner">
+                            <button id="btnIslam" onclick="AdienFinal.setMode('islam')" class="px-8 py-3 rounded-xl text-[11px] font-black transition-all tab-active">ISLAM (KHI)</button>
+                            <button id="btnBW" onclick="AdienFinal.setMode('bw')" class="px-8 py-3 rounded-xl text-[11px] font-black transition-all tab-inactive ml-2">PERDATA (BW)</button>
                         </div>
                     </div>
 
-                    <div id="results" class="space-y-4 min-h-[200px]"></div>
+                    <div id="results" class="space-y-4 min-h-[300px]">
+                        </div>
 
-                    <div class="mt-8 p-4 bg-slate-900/50 rounded-2xl border border-slate-700">
-                        <p id="disclaimer" class="text-[10px] text-slate-400 font-bold leading-relaxed uppercase"></p>
+                    <div class="mt-10 p-6 bg-slate-900/50 rounded-3xl border border-slate-800">
+                        <p id="disclaimer" class="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wider"></p>
                     </div>
 
-                    <div class="mt-6 flex gap-4">
-                        <button onclick="AdienFinal.calculate()" class="btn-prime flex-1 uppercase tracking-widest text-xs">Hitung Ulang</button>
-                        <button onclick="AdienFinal.pdf()" class="px-8 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition">UNDUH PDF</button>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onclick="AdienFinal.calculate()" class="btn-prime">
+                            <span>🔄 Hitung Ulang</span>
+                        </button>
+                        <button onclick="AdienFinal.pdf()" class="px-8 py-5 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition-all uppercase text-xs tracking-widest shadow-xl">
+                            Export PDF
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-</body>
-</html>
 
+    <footer class="py-12 border-t border-slate-900 text-center">
+        <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">Adien Digital Infrastructure &copy; 2024</p>
+    </footer>
+
+    <script>
+        const AdienFinal = {
+            state: { mode: 'islam', results: [] },
+
+            mask(el) {
+                let v = el.value.replace(/\D/g, "");
+                el.value = v ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v) : "";
+                this.calculate();
+            },
+
+            val(id) { return Math.round(parseFloat(document.getElementById(id).value.replace(/\D/g, "")) || 0); },
+            num(id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); },
+            fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.round(n)); },
+
+            setMode(m) {
+                this.state.mode = m;
+                document.getElementById('btnIslam').className = `px-8 py-3 rounded-xl text-[11px] font-black transition-all ${m==='islam'?'tab-active':'tab-inactive'}`;
+                document.getElementById('btnBW').className = `px-8 py-3 rounded-xl text-[11px] font-black transition-all ${m==='bw'?'tab-active':'tab-inactive'} ml-2`;
+                this.calculate();
+            },
+
+            calculate() {
+                const bruto = this.val('hartaRaw');
+                const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
+                let sisa = bruto - hBersama - this.val('utangRaw') - this.val('biayaRaw');
+                let zakat = (document.getElementById('isZakat').checked && sisa >= 85000000) ? Math.round(sisa * 0.025) : 0;
+                sisa -= zakat;
+
+                document.getElementById('netDisplay').innerText = this.fmt(sisa);
+                this.state.mode === 'islam' ? this.logicIslam(sisa) : this.logicBW(sisa);
+                
+                const disc = document.getElementById('disclaimer');
+                const infoText = this.state.mode === 'islam' ? 
+                    `Sesuai KHI: Angka merah (Rp 0) berarti terhijab. Jika Ahli Waris muncul dua kali berarti ahli waris tersebut juga mendapatkan bagian sisa (ashabah).` :
+                    `Sesuai BW: Mengikuti sistem Golongan Prioritas. Jika Golongan I ada, golongan di bawahnya otomatis Rp 0.`;
+                
+                disc.innerHTML = `<span class="text-blue-500">INFO:</span> ${infoText}<br><br>
+                                  <span class="text-slate-400">PENTING: KALKULASI INI ADALAH ESTIMASI. HARAP KONSULTASI DENGAN NOTARIS/AHLI AGAMA.</span>`;
+                this.display();
+            
     <script>
         const AdienFinal = {
             state: { mode: 'islam', results: [] },
