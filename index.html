@@ -356,20 +356,6 @@
     }
 
     // ================================
-    // 🧰 TOOLBOX NARASI DOUBLE PORTION
-    // ================================
-    const narasiDouble = [];
-    if (ayahDzul > 0 && ayahAshab > 0) {
-        narasiDouble.push(`🔥 AYAH KANDUNG dapat 2 kali (KHI 177): dzul faraidh + ashbah`);
-    }
-    if (apDzul > 0 && apAshab > 0) {
-        narasiDouble.push(`🔥 ANAK PEREMPUAN dapat 2 kali (KHI 176): dzul faraidh + ashbah 1:2`);
-    }
-    if (narasiDouble.length > 0) {
-        res.push({ n: '📢 INFO KHUSUS', r: 'Ahli Waris Mendapat 2 Kali', v: 0, count: 0, narasi: narasiDouble.join('\n'), type: 'toolbox' });
-    }
-
-    // ================================
     // HIJAB HIRMAN - HARUS v=0 & BELUM DAPAT BAGIAN
     // ================================
     const hijabCandidates = [];
