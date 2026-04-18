@@ -53,13 +53,21 @@
         </div>
     </header>
 
-<main class="max-w-7xl mx-auto px-6 py-10">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-5 space-y-6">
-            <div class="glass-card p-8">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">DATA ASET</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- INPUT ASET (KOLOM KIRI) -->
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-5 space-y-6">
+                <!-- DATA ASET + TOOLBOX FLOATING ? -->
+                <div class="relative glass-card p-8">
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        DATA ASET
+                        <span class="tooltip w-5 h-5 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
+                            ?
+                            <span class="tooltiptext max-w-xs">
+                                Total aset merupakan seluruh harta yang ada saat pewaris meninggal dunia. Apabila kolom Harta Bersama dicentang, maka aset tersebut akan otomatis dibagi dua terlebih dahulu, di mana separuhnya menjadi hak pasangan yang hidup dan separuh sisanya menjadi harta warisan. Dalam hukum waris Islam, jumlah Wasiat tidak boleh melebihi sepertiga dari total harta warisan dan tidak boleh diberikan kepada ahli waris dzawil furudh yang telah memiliki jatah pasti, yaitu suami/istri, ayah, ibu, anak perempuan, serta saudara.
+                            </span>
+                        </span>
+                    </h3>
+                    
                     <div class="space-y-4">
                         <input type="text" id="hartaRaw" class="input-dark" placeholder="Total Harta Bruto" oninput="AdienFinal.mask(this)">
                         <div class="grid grid-cols-2 gap-3">
@@ -69,43 +77,21 @@
                         <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
-                                Harta Bersama
+                                Harta Bersama 
+                                <span class="tooltip ml-1 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px]">
+                                    ?
+                                    <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
+                                </span>
                             </label>
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
                             </label>
                         </div>
                     </div>
-
-                    <!-- TOOLBOX INFO (KOLOM KANAN - SEBELAH DATA ASET) -->
-                    <div class="bg-gradient-to-b from-slate-50/80 to-slate-100/80 backdrop-blur-sm p-6 rounded-xl border border-slate-200/50 h-fit">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-2 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
-                            <h4 class="text-sm font-bold text-slate-800 tracking-wide">INFO HUKUM WARIS</h4>
-                        </div>
-                        <div class="space-y-3 text-xs leading-relaxed text-slate-700">
-                            <div class="font-medium text-slate-900">
-                                💰 <strong>Total aset</strong> merupakan seluruh harta yang ada saat pewaris meninggal dunia.
-                            </div>
-                            <div>
-                                Apabila kolom <strong>Harta Bersama</strong> dicentang, maka aset tersebut akan otomatis dibagi dua terlebih dahulu, di mana <strong>separuhnya menjadi hak pasangan yang hidup</strong> dan <strong>separuh sisanya menjadi harta warisan</strong>.
-                            </div>
-                            <div class="bg-blue-50/80 p-3 rounded-lg border border-blue-100/50">
-                                <div class="font-semibold text-blue-900 mb-1">📜 Wasiat Wajibah</div>
-                                <div class="text-blue-800 text-[11px]">
-                                    Jumlah wasiat <strong>t tidak boleh melebihi sepertiga dari total harta warisan</strong> dan <strong>t tidak boleh diberikan kepada ahli waris dzawil furudh</strong> yang telah memiliki jatah pasti:
-                                </div>
-                                <ul class="text-[10px] mt-1 ml-4 space-y-0.5 text-blue-800 list-disc list-inside">
-                                    <li>Suami/Istri</li>
-                                    <li>Ayah & Ibu</li>
-                                    <li>Anak Perempuan</li>
-                                    <li>Saudara</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
+        </div>
+    </main>
 
                 <div class="glass-card p-8">
                     <div class="flex items-center mb-6">
