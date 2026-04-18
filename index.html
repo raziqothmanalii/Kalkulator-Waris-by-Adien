@@ -209,27 +209,27 @@
 </html>
 
     <script>
-        const AdienFinal = {
-            state: { mode: 'islam', results: [] },
-
-            mask(el) {
-                let v = el.value.replace(/\D/g, "");
-                el.value = v ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v) : "";
-                this.calculate();
-            },
-
-            val(id) { return Math.round(parseFloat(document.getElementById(id).value.replace(/\D/g, "")) || 0); },
-            num(id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); },
-            fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.round(n)); },
-
-            setMode(m) {
-                this.state.mode = m;
-                document.getElementById('btnIslam').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='islam'?'tab-active':'tab-inactive'}`;
-                document.getElementById('btnBW').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='bw'?'tab-active':'tab-inactive'} ml-1`;
-                this.calculate();
-            },
-        
-            checkWasiatLimit() {
+    const AdienFinal = {
+        state: { mode: 'islam', results: [] },
+    
+        mask(el) {
+            let v = el.value.replace(/\D/g, "");
+            el.value = v ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v) : "";
+            this.calculate();
+        },
+    
+        val(id) { return Math.round(parseFloat(document.getElementById(id).value.replace(/\D/g, "")) || 0); },
+        num(id) { return Math.max(0, parseInt(document.getElementById(id).value) || 0); },
+        fmt(n) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.round(n)); },
+    
+        setMode(m) {
+            this.state.mode = m;
+            document.getElementById('btnIslam').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='islam'?'tab-active':'tab-inactive'}`;
+            document.getElementById('btnBW').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='bw'?'tab-active':'tab-inactive'} ml-1`;
+            this.calculate();
+        },
+    
+        checkWasiatLimit() {
             const bruto = this.val('hartaRaw');
             const utang = this.val('utangRaw');
             const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
@@ -243,11 +243,12 @@
             const inputEl = document.getElementById('biayaRaw');
             const warningEl = document.getElementById('wasiatWarning');
             
-            if (wasiat > maxWasiat && hartaNet > 0) {
+            // HANYA WARNING di mode ISLAM
+            if (this.state.mode === 'islam' && wasiat > maxWasiat && hartaNet > 0) {
                 inputEl.style.borderColor = '#ef4444';
                 inputEl.style.backgroundColor = '#fef2f2';
                 inputEl.style.color = '#dc2626';
-                warningEl.innerHTML = `⚠️ Wasiat melebihi <strong>${this.fmt(maxWasiat)}</strong> (1/3 harta warisan)`;
+                warningEl.innerHTML = `⚠️ <strong>HUKUM ISLAM:</strong> Wasiat melebihi ${this.fmt(maxWasiat)} (1/3 harta warisan)`;
                 warningEl.classList.remove('hidden');
             } else {
                 inputEl.style.borderColor = '#334155';
@@ -255,27 +256,29 @@
                 inputEl.style.color = 'white';
                 warningEl.classList.add('hidden');
             }
-            
-            calculate() {
-                const bruto = this.val('hartaRaw');
-                const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
-                let sisa = bruto - hBersama - this.val('utangRaw') - this.val('biayaRaw');
-                let zakat = (document.getElementById('isZakat').checked && sisa >= 85000000) ? Math.round(sisa * 0.025) : 0;
-                sisa -= zakat;
+        },
 
-                document.getElementById('netDisplay').innerText = this.fmt(sisa);
-                this.state.mode === 'islam' ? this.logicIslam(sisa) : this.logicBW(sisa);
-                
-                const disc = document.getElementById('disclaimer');
-                const infoText = this.state.mode === 'islam' ? 
-                    `Nominal Merah (Rp 0) menandakan Ahli Waris terhijab (Tertutup) sesuai Kompilasi Hukum Islam; Jika Ahli Waris muncul dua kali berarti ahli waris tersebut juga mendapatkan bagian sisa (ashobah).` :
-                    `Nominal Merah (Rp 0) menandakan Ahli Waris tidak mendapatkan bagian karena sistem derajat prioritas golongan KUH Perdata.`;
-                
-                disc.innerHTML = `📢 <span class="text-blue-400">INFO:</span> ${infoText}<br><br>
-                                  ⚠️ <span class="text-blue-400">PENTING:</span> KALKULATOR INI HANYA ALAT BANTU DAN BERSIFAT SIMULASI. KAMI TETAP MEREKOMENDASIKAN BERDISKUSI DENGAN AHLI WARIS, NOTARIS, ATAU TOKOH AGAMA UNTUK KEPUTUSAN FINAL.`;
+    calculate() {
+        const bruto = this.val('hartaRaw');
+        const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
+        let sisa = bruto - hBersama - this.val('utangRaw') - this.val('biayaRaw');
+        let zakat = (document.getElementById('isZakat').checked && sisa >= 85000000) ? Math.round(sisa * 0.025) : 0;
+        sisa -= zakat;
 
-                this.display();
+        document.getElementById('netDisplay').innerText = this.fmt(sisa);
+        this.state.mode === 'islam' ? this.logicIslam(sisa) : this.logicBW(sisa);
+        
+        const disc = document.getElementById('disclaimer');
+        const infoText = this.state.mode === 'islam' ? 
+            `Nominal Merah (Rp 0) menandakan Ahli Waris terhijab (Tertutup) sesuai Kompilasi Hukum Islam; Jika Ahli Waris muncul dua kali berarti ahli waris tersebut juga mendapatkan bagian sisa (ashobah).` :
+            `Nominal Merah (Rp 0) menandakan Ahli Waris tidak mendapatkan bagian karena sistem derajat prioritas golongan KUH Perdata.`;
+        
+        disc.innerHTML = `📢 <span class="text-blue-400">INFO:</span> ${infoText}<br><br>
+                          ⚠️ <span class="text-blue-400">PENTING:</span> KALKULATOR INI HANYA ALAT BANTU DAN BERSIFAT SIMULASI. KAMI TETAP MEREKOMENDASIKAN BERDISKUSI DENGAN AHLI WARIS, NOTARIS, ATAU TOKOH AGAMA UNTUK KEPUTUSAN FINAL.`;
+
+        this.display();
             },
+    
             logicIslam(netto) {
             let res = [], pool = netto;
             
