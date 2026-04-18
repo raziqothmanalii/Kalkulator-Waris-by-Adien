@@ -188,7 +188,7 @@
                 
                 const disc = document.getElementById('disclaimer');
                 const infoText = this.state.mode === 'islam' ? 
-                    `Nominal Merah (Rp 0) menandakan Ahli Waris terhijab (Tertutup) sesuai Kompilasi Hukum Islam.` :
+                    `Nominal Merah (Rp 0) menandakan Ahli Waris terhijab (Tertutup) sesuai Kompilasi Hukum Islam; Jika Ahli Waris muncul dua kali berarti ahli waris tersebut juga mendapatkan bagian sisa (ashobah).` :
                     `Nominal Merah (Rp 0) menandakan Ahli Waris tidak mendapatkan bagian karena sistem derajat prioritas golongan KUH Perdata.`;
                 
                 disc.innerHTML = `📢 <span class="text-blue-400">INFO:</span> ${infoText}<br><br>
@@ -199,203 +199,248 @@
             logicIslam(netto) {
     let res = [], pool = netto;
     
-    // Input
+    // Input values
     const gP = document.getElementById('genderP').value;
     const al = this.num('al'), ap = this.num('ap'), sl = this.num('sl'), sp = this.num('sp');
+    const pmn = this.num('paman'), tnt = this.num('tante');
     const hI = document.getElementById('hasIbu').checked, hA = document.getElementById('hasAyah').checked;
+    const hK = document.getElementById('hasKakek').checked, hN = document.getElementById('hasNenek').checked;
     
-    // Kondisi Kunci dari Tabel KHI
+    // Kondisi penentu
     const hasKeturunan = (al + ap) > 0;
     const hasSaudaraBanyak = (sl + sp) >= 2;
     const hasSaudara = (sl + sp) > 0;
-    const noKeturunanNoAyah = !hasKeturunan && !hA;
     
-    // Track double portion
-    let ayahDzul = 0, ayahAshab = 0;
-    let apDzul = 0, apAshab = 0;
+    console.log('=== PEMBAGIAN HARTA WARIS ISLAM KHI ===');
+    console.log(`Netto: ${netto}, Pool awal: ${pool}`);
+    console.log(`Keturunan: ${hasKeturunan}, Saudara banyak: ${hasSaudaraBanyak}`);
 
     // ================================
-    // A. PASANGAN - An-Nisa:12, KHI 179-180
+    // A. PASANGAN (PRIORITAS 1) - An-Nisa:12, KHI 179-180
     // ================================
     if (gP !== 'none') {
-        const bagian = hasKeturunan ? (gP === 'istri' ? '1/8' : '1/4') : (gP === 'istri' ? '1/4' : '1/2');
-        const v = Math.round(netto * eval(bagian));
+        const bagian = hasKeturunan ? (gP === 'istri' ? 1/8 : 1/4) : (gP === 'istri' ? 1/4 : 1/2);
+        const v = Math.round(netto * bagian);
         res.push({ 
             n: gP === 'istri' ? 'ISTRI/JANDA' : 'SUAMI/DUDA', 
             r: `An-Nisa:12, KHI ${gP === 'istri' ? 180 : 179}`, 
-            v, count: 1, bagian, type: 'dzul-faraidh'
+            v, 
+            count: 1,
+            bagian: `${bagian}`
         });
         pool -= v;
+        console.log(`1. ${res[res.length-1].n}: ${v} (${bagian}) | Pool: ${pool}`);
     }
 
     // ================================
     // B1. ANAK PEREMPUAN - An-Nisa:11, KHI 176
     // ================================
-    if (ap > 0 && al === 0) { // Sendirian/Tanpa AL
-        const bagian = ap === 1 ? '1/2' : '2/3';
-        apDzul = Math.round(netto * eval(bagian));
+    if (ap > 0 && al === 0) { // Hanya jika TIDAK ada anak laki-laki
+        const bagian = (ap === 1) ? 1/2 : 2/3;
+        const v = Math.round(netto * bagian);
         res.push({ 
-            n: `ANAK PEREMPUAN (${ap})`, 
+            n: 'ANAK PEREMPUAN', 
             r: 'An-Nisa:11, KHI 176', 
-            v: apDzul, count: ap, bagian, type: 'dzul-faraidh'
+            v, 
+            count: ap,
+            bagian: `${bagian}`
         });
-        pool -= apDzul;
+        pool -= v;
+        console.log(`2. ANAK PEREMPUAN (${ap}): ${v} (${bagian}) | Pool: ${pool}`);
     }
 
     // ================================
     // B3. AYAH KANDUNG - An-Nisa:11, KHI 177
     // ================================
     if (hA) {
-        const bagian = hasKeturunan ? '1/6' : '1/3';
-        ayahDzul = Math.round(netto * eval(bagian));
+        const bagian = hasKeturunan ? 1/6 : 1/3;
+        const v = Math.round(netto * bagian);
         res.push({ 
             n: 'AYAH KANDUNG', 
-            r: `An-Nisa:11, KHI 177 (${bagian})`, 
-            v: ayahDzul, count: 1, bagian, type: 'dzul-faraidh'
+            r: 'An-Nisa:11, KHI 177', 
+            v, 
+            count: 1,
+            bagian: `${bagian}`
         });
-        pool -= ayahDzul;
+        pool -= v;
+        console.log(`3. AYAH: ${v} (${bagian}) | Pool: ${pool}`);
     }
 
     // ================================
-    // B4. IBU KANDUNG - An-Nisa:11, KHI 178 (3 kondisi)
+    // B4. IBU KANDUNG - An-Nisa:11, KHI 178
     // ================================
     if (hI) {
-        let v = 0, bagian = '', keterangan = '';
+        let v = 0, dasar = '';
         
-        // Kondisi 1: Tidak ada anak/cucu, tidak ada 2+ saudara, tidak bersama Ayah
         if (!hasKeturunan && !hasSaudaraBanyak && !hA) {
+            // 1/3 penuh
             v = Math.round(netto * 1/3);
-            bagian = '1/3';
-            keterangan = 'tanpa anak/saudara/Ayah';
-        }
-        // Kondisi 2: Ada anak/cucu ATAU 2+ saudara, tidak bersama Ayah
-        else if ((hasKeturunan || hasSaudaraBanyak) && !hA) {
+            dasar = '1/3 (sendirian)';
+        } else if ((hasKeturunan || hasSaudaraBanyak) && !hA) {
+            // 1/6
             v = Math.round(netto * 1/6);
-            bagian = '1/6';
-            keterangan = 'ada anak/2+ saudara';
-        }
-        // Kondisi 3: Tidak ada anak/cucu, tidak ada 2+ saudara, TAPI bersama Ayah
-        else if (!hasKeturunan && !hasSaudaraBanyak && hA) {
+            dasar = '1/6 (ada anak/saudara banyak)';
+        } else if (!hasKeturunan && !hasSaudaraBanyak && hA) {
+            // 1/3 dari sisa setelah pasangan
             v = Math.round(pool * 1/3);
-            bagian = '1/3 sisa';
-            keterangan = 'bersama Ayah (setelah pasangan)';
+            dasar = '1/3 sisa (bersama Ayah)';
         }
         
         res.push({ 
             n: 'IBU KANDUNG', 
-            r: `An-Nisa:11, KHI 178 (${keterangan})`, 
-            v, count: 1, bagian, type: 'dzul-faraidh'
+            r: `An-Nisa:11, KHI 178 (${dasar})`, 
+            v, 
+            count: 1,
+            bagian: `${v/netto}`
         });
         pool -= v;
+        console.log(`4. IBU: ${v} (${dasar}) | Pool: ${pool}`);
     }
 
     // ================================
     // B5. SAUDARA SEIBU - An-Nisa:12, KHI 181
     // ================================
-    if (noKeturunanNoAyah && hasSaudara) {
-        const totalSeibu = sl + sp;
-        if (totalSeibu === 1) {
-            const v = Math.round(netto * 1/6);
-            res.push({ n: 'SAUDARA SEIBU (1)', r: 'An-Nisa:12, KHI 181 (1/6)', v, count: 1, type: 'dzul-faraidh' });
+    if (!hasKeturunan && !hA && hasSaudara) {
+        const totalSaudaraSeibu = sl + sp;
+        let v = 0, dasar = '';
+        
+        if (totalSaudaraSeibu === 1) {
+            v = Math.round(netto * 1/6);
+            dasar = '1/6 (sendirian)';
+        } else if (totalSaudaraSeibu >= 2) {
+            v = Math.round(netto * 1/3);
+            dasar = '1/3 (2+ orang)';
+        }
+        
+        if (v > 0) {
+            res.push({ 
+                n: 'SAUDARA SEIBU', 
+                r: `An-Nisa:12, KHI 181 (${dasar})`, 
+                v, 
+                count: totalSaudaraSeibu,
+                bagian: `${v/netto}`
+            });
             pool -= v;
-        } else if (totalSeibu >= 2) {
-            const v = Math.round(netto * 1/3);
-            res.push({ n: `SAUDARA SEIBU (${totalSeibu})`, r: 'An-Nisa:12, KHI 181 (1/3)', v, count: totalSeibu, type: 'dzul-faraidh' });
-            pool -= v;
+            console.log(`5. SAUDARA SEIBU (${totalSaudaraSeibu}): ${v} (${dasar}) | Pool: ${pool}`);
         }
     }
 
     // ================================
     // B6. SAUDARA PEREMPUAN KANDUNG/SEAYAH - An-Nisa:12, KHI 182
     // ================================
-    if (noKeturunanNoAyah && sp > 0 && sl === 0) {
-        const bagian = sp === 1 ? '1/2' : '2/3';
-        const v = Math.round(netto * eval(bagian));
-        res.push({ n: `SAUDARA PEREMPUAN (${sp})`, r: `An-Nisa:12, KHI 182 (${bagian})`, v, count: sp, type: 'dzul-faraidh' });
+    if (!hasKeturunan && !hA && sp > 0 && sl === 0) {
+        const bagian = (sp === 1) ? 1/2 : 2/3;
+        const v = Math.round(netto * bagian);
+        res.push({ 
+            n: 'SAUDARA PEREMPUAN KANDUNG/SEAYAH', 
+            r: `An-Nisa:12, KHI 182`, 
+            v, 
+            count: sp,
+            bagian: `${bagian}`
+        });
         pool -= v;
+        console.log(`6. SAUDARA PEREMPUAN (${sp}): ${v} (${bagian}) | Pool: ${pool}`);
     }
 
     // ================================
-    // ASHABAH - B2, B7 (An-Nisa:11,12 + Hadits 01)
+    // ASHABAH (PRIORITAS TERAKHIR) - An-Nisa:11,12 + Hadits 01
     // ================================
     if (pool > 0) {
-        // Prioritas Ashabah: 1. Anak Laki, 2. Ayah, 3. Saudara Laki
+        console.log('=== ASHABAH (Sisa Harta) ===');
+        
         if (al > 0) {
+            // Anak Laki-laki (2:1 dengan Anak Perempuan)
             const totalShare = al * 2 + ap;
             const ratio = pool / totalShare;
+            
+            const vLaki = Math.round(ratio * 2 * al);
             res.push({ 
-                n: `ANAK LAKI-LAKI (${al})`, 
-                r: 'Ashabah 2:1 (An-Nisa:11 + Hadits 01)', 
-                v: Math.round(ratio * 2 * al), count: al, type: 'ashabah'
+                n: 'ANAK LAKI-LAKI', 
+                r: 'Ashabah (An-Nisa:11 + Hadits 01)', 
+                v: vLaki, 
+                count: al,
+                bagian: '2:1'
             });
+            
             if (ap > 0) {
-                apAshab = Math.round(ratio * ap);
+                const vPerempuan = Math.round(ratio * ap);
                 res.push({ 
-                    n: `ANAK PEREMPUAN (${ap})`, 
-                    r: 'Ashabah 2:1 (An-Nisa:11 + Hadits 01)', 
-                    v: apAshab, count: ap, type: 'ashabah'
+                    n: 'ANAK PEREMPUAN', 
+                    r: 'Ashabah (An-Nisa:11 + Hadits 01)', 
+                    v: vPerempuan, 
+                    count: ap,
+                    bagian: '2:1'
                 });
             }
             pool = 0;
+            
         } else if (hA) {
-            ayahAshab = pool;
+            // Ayah ambil sisa
             res.push({ 
                 n: 'AYAH KANDUNG', 
                 r: 'Ashabah (An-Nisa:11)', 
-                v: ayahAshab, count: 1, type: 'ashabah'
+                v: pool, 
+                count: 1 
             });
             pool = 0;
-        } else if (noKeturunanNoAyah && sl > 0) {
+            
+        } else if (sl > 0) {
+            // Saudara Laki-laki (2:1 dengan Saudara Perempuan)
             const totalShare = sl * 2 + sp;
             const ratio = pool / totalShare;
+            
+            const vLaki = Math.round(ratio * 2 * sl);
             res.push({ 
-                n: `SAUDARA LAKI (${sl})`, 
-                r: 'Ashabah 2:1 (An-Nisa:12 + Hadits 01)', 
-                v: Math.round(ratio * 2 * sl), count: sl, type: 'ashabah'
+                n: 'SAUDARA LAKI-LAKI KANDUNG/SEAYAH', 
+                r: 'Ashabah (An-Nisa:12 + Hadits 01)', 
+                v: vLaki, 
+                count: sl,
+                bagian: '2:1'
             });
+            
+            if (sp > 0) {
+                const vPerempuan = Math.round(ratio * sp);
+                res.push({ 
+                    n: 'SAUDARA PEREMPUAN KANDUNG/SEAYAH', 
+                    r: 'Ashabah (An-Nisa:12 + Hadits 01)', 
+                    v: vPerempuan, 
+                    count: sp,
+                    bagian: '2:1'
+                });
+            }
             pool = 0;
         }
     }
 
     // ================================
-    // B8. CUCU/KEPONAKAN (Ijtihad KHI 185)
+    // HIJAB HIRMAN (TERHALANG)
     // ================================
-    // TODO: Implementasi pengganti posisi orang tua
+    if (hK && (hasKeturunan || hA)) {
+        res.push({ n: 'KAKEK', r: 'Hijab Hirman (Anak/Ayah)', v: 0, count: 1 });
+    }
+    if (hN && hI) {
+        res.push({ n: 'NENEK', r: 'Hijab Hirman (Ibu)', v: 0, count: 1 });
+    }
+    if (hasSaudara && (hasKeturunan || hA)) {
+        res.push({ n: `SAUDARA (${sl+sp})`, r: 'Hijab Hirman (Anak/Ayah)', v: 0, count: sl+sp });
+    }
+    if ((pmn + tnt > 0) && (hasKeturunan || hA || hI || hasSaudara)) {
+        res.push({ n: `PAMAN/TANTE (${pmn+tnt})`, r: 'Hijab Hirman (Ahli Waris Dekat)', v: 0, count: pmn+tnt });
+    }
 
     // ================================
-    // HIJAB HIRMAN & BAITULMAL
+    // BAITULMAL - KHI 185
     // ================================
-    // ... (kode hijab sama seperti sebelumnya)
-
     if (pool > 0) {
-        res.push({ n: 'BAITULMAL', r: 'KHI 185', v: pool, count: 1, type: 'baitulmal' });
-    }
-
-    // ================================
-    // 🧰 TOOLBOX NARASI - SIAPA DAPAT 2X?
-    // ================================
-    const narasiDouble = [];
-    
-    // Ayah dapat 2x (KHI 177)
-    if (hA && ayahDzul > 0 && ayahAshab > 0) {
-        narasiDouble.push(`🔥 AYAH KANDUNG dapat 2 kali (KHI 177): ${ayahDzul.toLocaleString()} (dzul faraidh) + ${ayahAshab.toLocaleString()} (ashabah)`);
-    }
-    
-    // Anak Perempuan dapat 2x (KHI 176)
-    if (apDzul > 0 && apAshab > 0) {
-        narasiDouble.push(`🔥 ANAK PEREMPUAN dapat 2 kali (KHI 176): ${apDzul.toLocaleString()} (dzul faraidh) + ${apAshab.toLocaleString()} (ashabah 1:2)`);
-    }
-
-    if (narasiDouble.length > 0) {
         res.push({ 
-            n: '📢 INFO KHUSUS', 
-            r: 'Ahli Waris Mendapat 2 Kali Bagian', 
-            v: 0, count: 0, 
-            narasi: narasiDouble.join('\n'), 
-            type: 'toolbox'
+            n: 'BAITULMAL', 
+            r: 'Sisa Harta (KHI 185)', 
+            v: pool, 
+            count: 1 
         });
     }
 
+    console.log('=== HASIL FINAL ===', res);
     this.state.results = res;
 },
             logicBW(netto) {
