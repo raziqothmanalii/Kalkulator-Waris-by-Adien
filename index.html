@@ -402,10 +402,47 @@
             biaya: 0,
             hartaNet: 0,
 
-            init() {
-                this.maskAll();
-                this.calculate();
-            },
+         const AdienFinal = {
+    // ... kode lainnya sama ...
+
+    init() {
+        this.attachEvents();
+        this.calculate(); // Initial calculation
+    },
+
+    attachEvents() {
+        // 1. Currency masking
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('input', (e) => {
+                this.mask(e.target);
+                this.debounceCalculate(); // Delay biar smooth
+            });
+        });
+
+        // 2. Number inputs & selects & checkboxes - INSTANT CALCULATE
+        document.querySelectorAll('input[type="number"], select, input[type="checkbox"]').forEach(el => {
+            el.addEventListener('input', () => this.debounceCalculate());
+            el.addEventListener('change', () => this.calculate()); // Immediate on change
+        });
+
+        // 3. Khusus untuk text inputs (harta, utang, biaya)
+        ['hartaRaw', 'utangRaw', 'biayaRaw'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('input', () => {
+                this.mask(el);
+                this.debounceCalculate();
+            });
+        });
+    },
+
+    // 4. DEBOUNCE untuk smooth performance (hindari lag)
+    debounceCalculate: (() => {
+        let timeout;
+        return function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => this.calculate(), 300); // 300ms delay
+        };
+    })(),
 
             mask(el) {
                 el.value = el.value.replace(/[^\d]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
