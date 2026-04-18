@@ -11,15 +11,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
     <style>
-                :root { 
+        :root { 
             --primary: #8b5cf6; 
             --accent: #3b82f6; 
-             --bg: #000000; 
+            --bg: #000000; 
             --card: #0a0a0a; 
             --text: #e2e8f0; 
             --border: #1e1e1e;
-             --glow: #8b5cf6;
-            }
+            --glow: #8b5cf6;
+        }
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: radial-gradient(ellipse at top, #0a0a0a 0%, #000000 70%); 
@@ -148,6 +148,9 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(139, 92, 246, 0.1);
             transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-radius: 16px;
         }
         .res-item:hover {
             border-color: var(--glow);
@@ -162,8 +165,6 @@
         .gol-ashaba { border-left-color: var(--glow) !important; box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); } 
         .gol-zero { border-left-color: #ef4444 !important; opacity: 0.7; }
         
-
-        
         #welcomeOverlay { 
             position: fixed; 
             inset: 0; 
@@ -177,7 +178,13 @@
         }
         .welcome-card {
             background: linear-gradient(145deg, #0a0a0a, #111111);
-            max-w-lg w-full rounded-[32px] p-8 md:p-12 text-center border border-[rgba(139,92,246,0.3)] shadow-2xl
+            max-width: 28rem;
+            width: 100%;
+            border-radius: 2rem;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(139,92,246,0.3);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
         }
@@ -209,24 +216,55 @@
             position: relative;
             box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
         }
+        .info-btn {
+            width: 1.25rem;
+            height: 1.25rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border-radius: 50%;
+            font-size: 0.625rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.25rem;
+        }
     </style>
 </head>
 <body class="dark">
-<div id="infoModal" onclick="this.style.display='none'"><div class="modal-content" onclick="event.stopPropagation()"><h4 class="text-purple-400 font-bold mb-2">INFO</h4><p id="modalText" class="text-sm text-slate-300"></p><button onclick="document.getElementById('infoModal').style.display='none'" class="mt-4 w-full bg-purple-600 py-2 rounded-xl text-white font-bold">Tutup</button></div></div>
+    <!-- Info Modal -->
+    <div id="infoModal" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h4 class="text-purple-400 font-bold mb-2 text-lg">INFO</h4>
+            <p id="modalText" class="text-sm text-slate-300 mb-6 leading-relaxed"></p>
+            <button onclick="document.getElementById('infoModal').style.display='none'" 
+                    class="w-full bg-gradient-to-r from-purple-600 to-purple-700 py-3 rounded-xl text-white font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-200">
+                Tutup
+            </button>
+        </div>
+    </div>
 
+    <!-- Welcome Overlay -->
     <div id="welcomeOverlay">
-        <div class="bg-[#1e293b] max-w-lg w-full rounded-[32px] p-8 md:p-12 text-center border border-slate-700 shadow-2xl">
-            <div class="w-20 h-20 bg-blue-900/30 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl border border-blue-500/20">🏛️</div>
+        <div class="welcome-card">
+            <div class="w-20 h-20 bg-blue-900/30 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl border border-blue-500/20">
+                🏛️
+            </div>
             <h2 class="text-2xl font-black mb-4 tracking-tight text-white">Kalkulator Waris by Adien</h2>
             <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 mb-6 text-left">
                 <p class="text-xs text-blue-100 leading-relaxed">
                     Website ini dirancang untuk menghitung estimasi pembagian waris Anda secara akurat sesuai kaidah Hukum Islam & KUH Perdata (BW). Jika Anda menemukan bug, error, atau kesalahan kalkulasi silakan hubungi: <span class="font-bold text-blue-400">raziqothmanalii@gmail.com</span>
                 </p>
             </div>
-            <button onclick="document.getElementById('welcomeOverlay').remove()" class="btn-prime w-full uppercase tracking-widest text-xs">Masuk ke Kalkulator</button>
+            <button onclick="document.getElementById('welcomeOverlay').remove()" 
+                    class="btn-prime w-full uppercase tracking-widest text-xs">
+                Masuk ke Kalkulator
+            </button>
         </div>
     </div>
 
+    <!-- Header -->
     <header class="bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800 py-6 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <h1 class="text-2xl font-black tracking-tighter text-white">Kalkulator Waris <span class="text-blue-500">by Adien</span></h1>
@@ -234,35 +272,43 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left Panel - Inputs -->
             <div class="lg:col-span-5 space-y-6">
+                <!-- Assets Section -->
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">💰 DATA ASET</h3>
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center">
+                        💰 DATA ASET
+                        <button type="button" class="info-btn ml-2" onclick="showPopup('Masukkan total harta bruto pewaris, utang, dan biaya wasiat.')">?</button>
+                    </h3>
                     <div class="space-y-4">
-                        <input type="text" id="hartaRaw" class="input-dark" placeholder="Total Harta Bruto" oninput="AdienFinal.mask(this)">
+                        <input type="text" id="hartaRaw" class="input-dark" placeholder="Rp 0" oninput="AdienFinal.mask(this)">
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="utangRaw" class="input-dark" placeholder="Utang" oninput="AdienFinal.mask(this)">
-                            <input type="text" id="biayaRaw" class="input-dark" placeholder="Biaya Wasiat" oninput="AdienFinal.mask(this)">
+                            <input type="text" id="utangRaw" class="input-dark" placeholder="Rp 0" oninput="AdienFinal.mask(this)">
+                            <input type="text" id="biayaRaw" class="input-dark" placeholder="Rp 0" oninput="AdienFinal.mask(this)">
                         </div>
                         <div class="flex gap-4 p-2 bg-slate-900/50 rounded-2xl">
-                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
+                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold rounded-xl hover:bg-slate-800/50 transition-colors">
                                 <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
                                 Harta Bersama
-                                    <button type="button" onclick="showPopup('Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup.')" class="ml-1 w-5 h-5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">?</button>
-                                    <span class="tooltiptext">Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup dan bukan merupakan objek waris.</span>
-                                </span>
+                                <button type="button" class="info-btn" onclick="showPopup('Harta Bersama: 50% dari aset bruto adalah hak milik pasangan (suami/istri) yang masih hidup.')">?</button>
                             </label>
-                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
+                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold rounded-xl hover:bg-slate-800/50 transition-colors">
                                 <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
+                                <button type="button" class="info-btn" onclick="showPopup('Zakat mal wajib dikeluarkan 2.5% dari harta bersih sebelum pembagian waris.')">?</button>
                             </label>
                         </div>
                     </div>
                 </div>
 
+                <!-- Core Family -->
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 KELUARGA INTI</h3>
-                    <button type="button" onclick="showPopup('Keluarga Inti terdiri dari Pasangan, Anak, dan Orang Tua.')" class="ml-1 w-5 h-5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">?</button>
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center">
+                        👥 KELUARGA INTI
+                        <button type="button" class="info-btn ml-2" onclick="showPopup('Keluarga Inti terdiri dari Pasangan, Anak, dan Orang Tua.')">?</button>
+                    </h3>
                     <div class="space-y-4">
                         <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
                             <option value="none">Pilih Pasangan</option>
@@ -270,47 +316,50 @@
                             <option value="suami">Suami</option>
                         </select>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="al" class="input-dark" placeholder="Jml Anak Laki" oninput="AdienFinal.calculate()">
-                            <input type="number" id="ap" class="input-dark" placeholder="Jml Anak Per" oninput="AdienFinal.calculate()">
+                            <input type="number" id="al" class="input-dark" placeholder="0" min="0" oninput="AdienFinal.calculate()">
+                            <input type="number" id="ap" class="input-dark" placeholder="0" min="0" oninput="AdienFinal.calculate()">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:bg-slate-800/50 transition-colors">
                                 <input type="checkbox" id="hasIbu" onchange="AdienFinal.calculate()"> Ada Ibu
                             </label>
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:bg-slate-800/50 transition-colors">
                                 <input type="checkbox" id="hasAyah" onchange="AdienFinal.calculate()"> Ada Ayah
                             </label>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="sl" class="input-dark" placeholder="Sdr Laki-laki" oninput="AdienFinal.calculate()">
-                            <input type="number" id="sp" class="input-dark" placeholder="Sdr Perempuan" oninput="AdienFinal.calculate()">
+                            <input type="number" id="sl" class="input-dark" placeholder="0" min="0" oninput="AdienFinal.calculate()">
+                            <input type="number" id="sp" class="input-dark" placeholder="0" min="0" oninput="AdienFinal.calculate()">
                         </div>
                     </div>
                 </div>
 
+                <!-- Extended Family -->
                 <div class="glass-card p-8 bg-slate-800/20">
                     <div class="flex items-center mb-6">
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400">🧬 KELUARGA LAINNYA</h3>
-                        <button type="button" onclick="showPopup('Jika golongan utama tidak ada, maka menggunakan metode kloving.')" class="ml-1 w-5 h-5 bg-blue-500/20 text-blue-400 rounded-full text-[10px]">?</button>
-                        </span>
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400 flex items-center">
+                            🧬 KELUARGA LAINNYA
+                            <button type="button" class="info-btn ml-2" onclick="showPopup('Jika golongan utama tidak ada, maka menggunakan metode kloving.')">?</button>
+                        </h3>
                     </div>
                     <div class="space-y-4">            
                         <div class="grid grid-cols-2 gap-3">
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:bg-slate-800/50 transition-colors">
                                 <input type="checkbox" id="hasKakek" onchange="AdienFinal.calculate()"> Ada Kakek
                             </label>
-                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold hover:bg-slate-800/50 transition-colors">
                                 <input type="checkbox" id="hasNenek" onchange="AdienFinal.calculate()"> Ada Nenek
                             </label>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="number" id="paman" class="input-dark" placeholder="Jml Paman" oninput="AdienFinal.calculate()">
-                            <input type="number" id="tante" class="input-dark" placeholder="Jml Tante" oninput="AdienFinal.calculate()">
+                            <input type="number" id="paman" class="input-dark" placeholder="0" min="0" oninput="AdienFinal.calculate()">
+                            <input type="number" id="tante" class="input-dark" placeholder="0" min="0" oninput="AdienFinal.calculate()">
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Right Panel - Results -->
             <div class="lg:col-span-7">
                 <div class="glass-card p-8 sticky top-28 border-t-8 border-blue-500">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -331,14 +380,235 @@
                     </div>
 
                     <div class="mt-6 flex gap-4">
-                        <button onclick="AdienFinal.calculate()" class="btn-prime flex-1 uppercase tracking-widest text-xs">Hitung Ulang</button>
-                        <button onclick="AdienFinal.pdf()" class="px-8 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition">UNDUH PDF</button>
+                        <button onclick="AdienFinal.calculate()" class="btn-prime flex-1 uppercase tracking-widest text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                            Hitung Ulang
+                        </button>
+                        <button onclick="AdienFinal.pdf()" class="px-8 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            UNDUH PDF
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <script>
+        const AdienFinal = {
+            mode: 'islam',
+            harta: 0,
+            utang: 0,
+            biaya: 0,
+            hartaNet: 0,
+
+            init() {
+                this.maskAll();
+                this.calculate();
+            },
+
+            mask(el) {
+                el.value = el.value.replace(/[^\d]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            },
+
+            maskAll() {
+                document.querySelectorAll('input[type="text"]').forEach(input => {
+                    input.addEventListener('input', () => this.mask(input));
+                });
+            },
+
+            setMode(mode) {
+                this.mode = mode;
+                document.getElementById('btnIslam').className = mode === 'islam' ? 'px-6 py-2.5 rounded-xl text-xs font-black transition tab-active' : 'px-6 py-2.5 rounded-xl text-xs font-black transition tab-inactive';
+                document.getElementById('btnBW').className = mode === 'bw' ? 'px-6 py-2.5 rounded-xl text-xs font-black transition tab-active ml-1' : 'px-6 py-2.5 rounded-xl text-xs font-black transition tab-inactive ml-1';
+                this.calculate();
+            },
+
+            getInputs() {
+                this.harta = parseInt(document.getElementById('hartaRaw').value.replace(/\./g, '')) || 0;
+                this.utang = parseInt(document.getElementById('utangRaw').value.replace(/\./g, '')) || 0;
+                this.biaya = parseInt(document.getElementById('biayaRaw').value.replace(/\./g, '')) || 0;
+
+                const hartaBersama = document.getElementById('isBersama').checked ? this.harta * 0.5 : 0;
+                const zakat = document.getElementById('isZakat').checked ? (this.harta - this.utang - hartaBersama) * 0.025 : 0;
+
+                this.hartaNet = Math.max(0, this.harta - hartaBersama - this.utang - this.biaya - zakat);
+
+                return {
+                    genderP: document.getElementById('genderP').value,
+                    al: parseInt(document.getElementById('al').value) || 0,
+                    ap: parseInt(document.getElementById('ap').value) || 0,
+                    hasIbu: document.getElementById('hasIbu').checked,
+                    hasAyah: document.getElementById('hasAyah').checked,
+                    sl: parseInt(document.getElementById('sl').value) || 0,
+                    sp: parseInt(document.getElementById('sp').value) || 0,
+                    hasKakek: document.getElementById('hasKakek').checked,
+                    hasNenek: document.getElementById('hasNenek').checked,
+                    paman: parseInt(document.getElementById('paman').value) || 0,
+                    tante: parseInt(document.getElementById('tante').value) || 0
+                };
+            },
+
+            calculate() {
+                const inputs = this.getInputs();
+                document.getElementById('netDisplay').textContent = `Rp ${this.formatNumber(this.hartaNet)}`;
+
+                let results = '';
+                let disclaimer = '';
+
+                if (this.mode === 'islam') {
+                    results = this.calculateIslam(inputs);
+                    disclaimer = '⚠️ Estimasi berdasarkan Hukum Islam (Faraid). Konsultasikan dengan ahli waris untuk kepastian.';
+                } else {
+                    results = this.calculateBW(inputs);
+                    disclaimer = '⚠️ Estimasi berdasarkan KUH Perdata (BW). Pembagian dapat berbeda berdasarkan perjanjian/prenuptial.';
+                }
+
+                document.getElementById('results').innerHTML = results;
+                document.getElementById('disclaimer').textContent = disclaimer;
+            },
+
+            calculateIslam(inputs) {
+                let html = '';
+                const totalAnak = inputs.al + inputs.ap;
+                
+                // Pasangan
+                if (inputs.genderP === 'istri') {
+                    html += this.createResult('Istri', '1/8', 12.5, 'gol-prio');
+                } else if (inputs.genderP === 'suami') {
+                    if (totalAnak > 0) {
+                        html += this.createResult('Suami', '1/4', 25, 'gol-prio');
+                    } else {
+                        html += this.createResult('Suami', '1/2', 50, 'gol-prio');
+                    }
+                }
+
+                // Anak
+                if (totalAnak > 0) {
+                    const bagianAnak = inputs.al * 2 + inputs.ap;
+                    const persenAnak = Math.min(66.67, (bagianAnak / (bagianAnak + (inputs.genderP === 'suami' ? 2 : 0))) * (100 - (inputs.genderP ? 25 : 0)));
+                    html += this.createResult(`Anak (${inputs.al}L + ${inputs.ap}P)`, `${persenAnak.toFixed(1)}%`, persenAnak, 'gol-prio');
+                }
+
+                // Orang Tua
+                if (inputs.hasIbu) html += this.createResult('Ibu', '1/6', 16.67, 'gol-prio');
+                if (inputs.hasAyah && !totalAnak) html += this.createResult('Ayah', '1/6', 16.67, 'gol-prio');
+
+                // Saudara
+                if (!totalAnak && !inputs.hasAyah) {
+                    const totalSdr = inputs.sl * 2 + inputs.sp;
+                    if (totalSdr > 0) {
+                        html += this.createResult(`Saudara (${inputs.sl}L + ${inputs.sp}P)`, 'Sisa', 100 - (inputs.genderP ? 50 : 0), 'gol-ashaba');
+                    }
+                }
+
+                // Keluarga Lain
+                if (!totalAnak && !inputs.hasAyah && !inputs.hasIbu) {
+                    if (inputs.hasKakek) html += this.createResult('Kakek', '1/6', 16.67, 'gol-ashaba');
+                    if (inputs.paman > 0) html += this.createResult(`Paman (${inputs.paman})`, 'Sisa', 50, 'gol-ashaba');
+                }
+
+                if (!html) html = '<div class="text-center py-12 text-slate-500">Masukkan data keluarga untuk melihat hasil perhitungan</div>';
+
+                return html;
+            },
+
+            calculateBW(inputs) {
+                let html = '';
+                
+                // Pasangan
+                if (inputs.genderP === 'istri') {
+                    html += this.createResult('Istri', '1/2', 50, 'gol-prio');
+                } else if (inputs.genderP === 'suami') {
+                    html += this.createResult('Suami', '1/2', 50, 'gol-prio');
+                }
+
+                // Anak
+                const totalAnak = inputs.al + inputs.ap;
+                if (totalAnak > 0) {
+                    const persenAnak = 50;
+                    html += this.createResult(`Anak (${totalAnak})`, `${persenAnak}%`, persenAnak, 'gol-prio');
+                }
+
+                // Orang Tua
+                if (inputs.hasIbu || inputs.hasAyah) {
+                    const persenOrtu = 25;
+                    html += this.createResult('Orang Tua', `${persenOrtu}%`, persenOrtu, 'gol-prio');
+                }
+
+                if (!html) html = '<div class="text-center py-12 text-slate-500">Masukkan data keluarga untuk melihat hasil perhitungan</div>';
+
+                return html;
+            },
+
+            createResult(nama, bagian, persen, golongan) {
+                const jumlah = Math.round((this.hartaNet * persen) / 100);
+                return `
+                    <div class="res-item ${golongan}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-bold text-lg">${nama}</span>
+                            <span class="text-blue-400 font-black text-sm">${bagian}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-black text-green-400">Rp ${this.formatNumber(jumlah)}</span>
+                            <div class="text-right">
+                                <div class="text-sm text-slate-400">${persen}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            formatNumber(num) {
+                return new Intl.NumberFormat('id-ID').format(num);
+            },
+
+            pdf() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(20);
+                doc.setTextColor(139, 92, 246);
+                doc.text('Kalkulator Waris by Adien', 20, 20);
+                
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Harta Bersih: Rp ${this.formatNumber(this.hartaNet)}`, 20, 35);
+                doc.text(`Mode: ${this.mode === 'islam' ? 'Hukum Islam' : 'KUH Perdata'}`, 20, 45);
+                
+                const tableData = [];
+                const results = document.querySelectorAll('#results .res-item');
+                results.forEach(item => {
+                    const nama = item.querySelector('span').textContent;
+                    const jumlah = item.querySelector('.text-green-400').textContent;
+                    tableData.push([nama, jumlah]);
+                });
+                
+                doc.autoTable({
+                    startY: 60,
+                    head: [['Penerima', 'Jumlah']],
+                    body: tableData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [139, 92, 246] },
+                    styles: { fontSize: 10 }
+                });
+                
+                doc.save('kalkulator-waris-adien.pdf');
+            }
+        };
+
+        function showPopup(text) {
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            AdienFinal.init();
+        });
+    </script>
 </body>
+</html>
 </html>
 
     <script>
