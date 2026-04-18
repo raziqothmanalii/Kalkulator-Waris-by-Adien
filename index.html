@@ -27,7 +27,7 @@
         #welcomeOverlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 24px; }
         
         .tooltip { position: relative; display: inline-block; cursor: help; }
-        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 8px; padding: 10px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; border: 1px solid #334155; font-size: 10px; font-weight: normal; line-height: 1.4; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+        .tooltip .tooltiptext { visibility: hidden; width: 240px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 12px; padding: 12px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -120px; opacity: 0; transition: opacity 0.3s; border: 1px solid #475569; font-size: 10px; font-weight: normal; line-height: 1.5; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
@@ -81,7 +81,18 @@
                 </div>
 
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 KELUARGA INTI</h3>
+                    <div class="flex items-center mb-6">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">👥 KELUARGA INTI</h3>
+                        <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
+                            ?
+                            <span class="tooltiptext">
+                                <b>Dalam perhitungan KUH Perdata:</b><br>
+                                • <b>Golongan I:</b> Merujuk kepada Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
+                                • <b>Golongan II:</b> Merujuk kepada Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.<br><br>
+                                <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
+                            </span>
+                        </span>
+                    </div>
                     <div class="space-y-4">
                         <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
                             <option value="none">Pilih Pasangan</option>
@@ -112,7 +123,13 @@
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400">🧬 KELUARGA LAINNYA</h3>
                         <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
                             ?
-                            <span class="tooltiptext">Jika golongan ahli waris utama tidak tersedia, keluarga lainnya dapat tampil sebagai ahli waris. Perhitungannya menggunakan metode kloving, di mana harta harus dipisahkan secara adil (50:50) antara pihak keluarga ayah dan pihak keluarga ibu, lalu dibagi per kepala di masing masing cabang keluarga.</span>
+                            <span class="tooltiptext">
+                                <b>Dalam perhitungan KUH Perdata:</b><br>
+                                • <b>Golongan III:</b> Merujuk kepada Kakek, Nenek, dan leluhur ke atas lainnya.<br>
+                                • <b>Golongan IV:</b> Merujuk kepada Paman, Tante, dan keturunannya hingga derajat ke-6.<br><br>
+                                <b>Catatan:</b> Jika golongan utama tidak ada, harta dibagi 50:50 antara garis ayah & ibu (kloving) lalu dibagi rata per kepala.<br><br>
+                                <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
+                            </span>
                         </span>
                     </div>
                     <div class="space-y-4">
