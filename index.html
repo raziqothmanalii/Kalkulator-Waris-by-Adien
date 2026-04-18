@@ -29,6 +29,27 @@
         .tooltip { position: relative; display: inline-block; cursor: help; }
         .tooltip .tooltiptext { visibility: hidden; width: 280px; background-color: #0f172a; color: #fff; text-align: left; border-radius: 12px; padding: 12px; position: absolute; z-index: 1000; top: 125%; left: 50%; margin-left: -140px; opacity: 0; transition: opacity 0.3s; border: 1px solid #475569; font-size: 10px; font-weight: normal; line-height: 1.5; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        
+        @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+    }
+    .warning-wasiat {
+        border-color: #ef4444 !important;
+        background-color: #fef2f2 !important;
+        animation: shake 0.5s ease-in-out;
+    }
+    .wasiat-alert {
+        background: linear-gradient(90deg, #fef2f2, #fecaca);
+        border: 1px solid #ef4444;
+        color: #dc2626;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-top: 4px;
+    }
     </style>
 </head>
 <body class="dark">
@@ -71,7 +92,10 @@
                     <input type="text" id="hartaRaw" class="input-dark" placeholder="Total Harta Bruto" oninput="AdienFinal.mask(this)">
                     <div class="grid grid-cols-2 gap-3">
                         <input type="text" id="utangRaw" class="input-dark" placeholder="Utang" oninput="AdienFinal.mask(this)">
-                        <input type="text" id="biayaRaw" class="input-dark" placeholder="Biaya Wasiat" oninput="AdienFinal.mask(this)">
+                        <div class="relative">
+                            <input type="text" id="biayaRaw" class="input-dark" placeholder="Biaya Wasiat (max 1/3)" oninput="AdienFinal.mask(this); AdienFinal.checkWasiatLimit();">
+                            <div id="wasiatWarning" class="wasiat-alert hidden"></div>
+                        </div>
                     </div>
                     <div class="space-y-3">
                         <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
@@ -204,7 +228,34 @@
                 document.getElementById('btnBW').className = `px-6 py-2.5 rounded-xl text-xs font-black transition ${m==='bw'?'tab-active':'tab-inactive'} ml-1`;
                 this.calculate();
             },
-
+        
+            checkWasiatLimit() {
+            const bruto = this.val('hartaRaw');
+            const utang = this.val('utangRaw');
+            const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
+            let hartaNet = bruto - hBersama - utang;
+            const isZakat = document.getElementById('isZakat').checked;
+            if (isZakat) hartaNet = hartaNet * 0.975;
+            
+            const wasiat = this.val('biayaRaw');
+            const maxWasiat = Math.round(hartaNet / 3);
+            
+            const inputEl = document.getElementById('biayaRaw');
+            const warningEl = document.getElementById('wasiatWarning');
+            
+            if (wasiat > maxWasiat && hartaNet > 0) {
+                inputEl.style.borderColor = '#ef4444';
+                inputEl.style.backgroundColor = '#fef2f2';
+                inputEl.style.color = '#dc2626';
+                warningEl.innerHTML = `⚠️ Wasiat melebihi <strong>${this.fmt(maxWasiat)}</strong> (1/3 harta warisan)`;
+                warningEl.classList.remove('hidden');
+            } else {
+                inputEl.style.borderColor = '#334155';
+                inputEl.style.backgroundColor = '#0f172a';
+                inputEl.style.color = 'white';
+                warningEl.classList.add('hidden');
+            }
+            
             calculate() {
                 const bruto = this.val('hartaRaw');
                 const hBersama = document.getElementById('isBersama').checked ? Math.round(bruto * 0.5) : 0;
@@ -222,7 +273,7 @@
                 
                 disc.innerHTML = `📢 <span class="text-blue-400">INFO:</span> ${infoText}<br><br>
                                   ⚠️ <span class="text-blue-400">PENTING:</span> KALKULATOR INI HANYA ALAT BANTU DAN BERSIFAT SIMULASI. KAMI TETAP MEREKOMENDASIKAN BERDISKUSI DENGAN AHLI WARIS, NOTARIS, ATAU TOKOH AGAMA UNTUK KEPUTUSAN FINAL.`;
-                
+
                 this.display();
             },
             logicIslam(netto) {
