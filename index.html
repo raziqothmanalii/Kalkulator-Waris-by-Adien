@@ -54,17 +54,14 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6 py-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-5 space-y-6">
-                <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">DATA ASET</h3>
-                      <span class="tooltip ml-1 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px]">
-                                    ?
-                                    <span class="tooltiptext">Total aset merupakan seluruh harta yang ada saat pewaris meninggal dunia. Apabila kolom Harta Bersama dicentang, maka aset tersebut akan otomatis dibagi dua terlebih dahulu, di mana separuhnya menjadi hak pasangan yang hidup dan separuh sisanya menjadi harta warisan. Dalam hukum waris Islam, jumlah Wasiat tidak boleh melebihi sepertiga dari total harta warisan dan tidak boleh diberikan kepada ahli waris dzawil furudh yang telah memiliki jatah pasti, yaitu suami/istri, ayah, ibu, anak, serta saudara.</span>
-                                </span>
-                            </label>
-                        <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
-                    <div class="space-y-4">
+        <div class="glass-card p-8">
+                    <div class="flex items-center mb-6">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">DATA ASET</h3>
+                        <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
+                            ?
+                        <span class="tooltiptext">
+                                <b>Total aset merupakan seluruh harta yang ada saat pewaris meninggal dunia. Apabila kolom Harta Bersama dicentang, maka aset tersebut akan otomatis dibagi dua terlebih dahulu, di mana separuhnya menjadi hak pasangan yang hidup dan separuh sisanya menjadi harta warisan. Dalam hukum waris Islam, jumlah Wasiat tidak boleh melebihi sepertiga dari total harta warisan dan tidak boleh diberikan kepada ahli waris dzawil furudh yang telah memiliki jatah pasti, yaitu suami/istri, ayah, ibu, anak perempuan, serta saudara.<b>
+                            </span>
                         <input type="text" id="hartaRaw" class="input-dark" placeholder="Total Harta Bruto" oninput="AdienFinal.mask(this)">
                         <div class="grid grid-cols-2 gap-3">
                             <input type="text" id="utangRaw" class="input-dark" placeholder="Utang" oninput="AdienFinal.mask(this)">
@@ -74,6 +71,9 @@
                             <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isBersama" onchange="AdienFinal.calculate()"> 
                                 Harta Bersama 
+                            </span>
+                            </label>
+                            <label class="flex-1 p-3 flex items-center gap-2 cursor-pointer text-xs font-bold">
                                 <input type="checkbox" id="isZakat" onchange="AdienFinal.calculate()"> Zakat (2.5%)
                             </label>
                         </div>
