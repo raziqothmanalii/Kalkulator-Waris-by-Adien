@@ -81,7 +81,17 @@
                 </div>
 
                 <div class="glass-card p-8">
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">👥 KELUARGA INTI</h3>
+                    <div class="flex items-center mb-6">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">👥 KELUARGA INTI</h3>
+                        <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
+                            ?
+                            <span class="tooltiptext">
+                                <b>Dalam perhitungan KUH Perdata:</b><br>
+                                • <b>Golongan I:</b> Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
+                                • <b>Golongan II:</b> Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.
+                            </span>
+                        </span>
+                    </div>
                     <div class="space-y-4">
                         <select id="genderP" class="input-dark" onchange="AdienFinal.calculate()">
                             <option value="none">Pilih Pasangan</option>
@@ -112,7 +122,12 @@
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400">🧬 KELUARGA LAINNYA</h3>
                         <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
                             ?
-                            <span class="tooltiptext">Jika golongan ahli waris utama tidak tersedia, keluarga lainnya dapat tampil sebagai ahli waris. Perhitungannya menggunakan metode kloving, di mana harta harus dipisahkan secara adil (50:50) antara pihak keluarga ayah dan pihak keluarga ibu, lalu dibagi per kepala di masing masing cabang keluarga.</span>
+                            <span class="tooltiptext">
+                                <b>Dalam perhitungan KUH Perdata:</b><br>
+                                • <b>Golongan III:</b> Kakek, Nenek, dan leluhur ke atas lainnya.<br>
+                                • <b>Golongan IV:</b> Anggota keluarga dalam garis menyimpang (Paman, Tante, dan keturunannya hingga derajat ke-6).<br><br>
+                                <b>Catatan:</b> Jika golongan utama tidak ada, harta dipisahkan 50:50 antara keluarga ayah & ibu (kloving), lalu dibagi per kepala di masing-masing cabang.
+                            </span>
                         </span>
                     </div>
                     <div class="space-y-4">
