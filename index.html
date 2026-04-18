@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
     <style>
-        :root { 
+                :root { 
             --primary: #8b5cf6; 
             --accent: #3b82f6; 
              --bg: #000000; 
@@ -19,7 +19,7 @@
             --text: #e2e8f0; 
             --border: #1e1e1e;
              --glow: #8b5cf6;
-        }
+            }
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background: radial-gradient(ellipse at top, #0a0a0a 0%, #000000 70%); 
@@ -71,12 +71,6 @@
         @keyframes shimmer {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
-        }
-        
-        /* FIX Z-INDEX: Toolbox cards selalu di layer depan */
-        .toolbox-card {
-            position: relative;
-            z-index: 50 !important;
         }
         
         .input-dark { 
@@ -203,7 +197,7 @@
             border-radius: 16px; 
             padding: 14px; 
             position: absolute; 
-            z-index: 100; /* Tooltip di atas semua elemen */
+            z-index: 10; 
             bottom: 125%; 
             left: 50%; 
             margin-left: -130px; 
@@ -250,18 +244,6 @@
             background-clip: text;
             font-size: 1.5rem !important;
         }
-
-        /* Results area z-index lebih rendah dari toolbox */
-        #results {
-            position: relative;
-            z-index: 20;
-        }
-        
-        /* Main results card z-index lebih rendah dari toolbox */
-        .results-container {
-            position: relative;
-            z-index: 30;
-        }
     </style>
 </head>
 <body class="dark">
@@ -279,7 +261,7 @@
         </div>
     </div>
 
-    <header class="bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800 py-6 sticky top-0 z-40">
+    <header class="bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800 py-6 sticky top-0 z-0">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <h1 class="text-2xl font-black tracking-tighter text-white">Kalkulator Waris <span class="text-blue-500">by Adien</span></h1>
             <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-700 px-3 py-1 rounded-full">BETA EDITION</span>
@@ -288,10 +270,8 @@
 
     <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- TOOLBOX CARDS - Z-INDEX TINGGI (Layer Depan) -->
             <div class="lg:col-span-5 space-y-6">
-                <!-- Harta Bersama - Z-Index 50 -->
-                <div class="glass-card p-8 toolbox-card">
+                <div class="glass-card p-8">
                     <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-6">💰 DATA ASET</h3>
                     <div class="space-y-4">
                         <input type="text" id="hartaRaw" class="input-dark" placeholder="Total Harta Bruto" oninput="AdienFinal.mask(this)">
@@ -315,16 +295,15 @@
                     </div>
                 </div>
 
-                <!-- Keluarga Inti - Z-Index 50 -->
-                <div class="glass-card p-8 toolbox-card">
+                <div class="glass-card p-8">
                     <div class="flex items-center mb-6">
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">👥 KELUARGA INTI</h3>
                         <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
                             ?
                             <span class="tooltiptext">
                                 <b>Dalam perhitungan KUH Perdata:</b><br>
-                                - <b>Golongan I:</b> Merujuk kepada Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
-                                - <b>Golongan II:</b> Merujuk kepada Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.<br><br>
+                                • <b>Golongan I:</b> Merujuk kepada Suami/Istri yang hidup terlama dan anak-anak beserta keturunannya.<br>
+                                • <b>Golongan II:</b> Merujuk kepada Orang tua (Ayah/Ibu) dan saudara-saudara kandung beserta keturunannya.<br><br>
                                 <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
                             </span>
                         </span>
@@ -335,7 +314,85 @@
                             <option value="istri">Istri</option>
                             <option value="suami">Suami</option>
                         </select>
-                        <div class="grid
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="al" class="input-dark" placeholder="Jml Anak Laki" oninput="AdienFinal.calculate()">
+                            <input type="number" id="ap" class="input-dark" placeholder="Jml Anak Per" oninput="AdienFinal.calculate()">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                <input type="checkbox" id="hasIbu" onchange="AdienFinal.calculate()"> Ada Ibu
+                            </label>
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                <input type="checkbox" id="hasAyah" onchange="AdienFinal.calculate()"> Ada Ayah
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="sl" class="input-dark" placeholder="Sdr Laki-laki" oninput="AdienFinal.calculate()">
+                            <input type="number" id="sp" class="input-dark" placeholder="Sdr Perempuan" oninput="AdienFinal.calculate()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 bg-slate-800/20">
+                    <div class="flex items-center mb-6">
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-400">🧬 KELUARGA LAINNYA</h3>
+                        <span class="tooltip ml-2 w-4 h-4 flex items-center justify-center bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] cursor-help">
+                            ?
+                            <span class="tooltiptext">
+                                <b>Dalam perhitungan KUH Perdata:</b><br>
+                                • <b>Golongan III:</b> Merujuk kepada Kakek, Nenek, dan leluhur ke atas lainnya.<br>
+                                • <b>Golongan IV:</b> Merujuk kepada Paman, Tante, dan keturunannya hingga derajat ke-6.<br><br>
+                                <b>Catatan:</b> Jika Keluarga Inti (Golongan I dan II) tidak ada, harta dibagi 50:50 antara garis ayah & ibu (kloving) lalu dibagi rata per kepala.<br><br>
+                                <span class="text-blue-400 italic">*Dalam perhitungan waris Islam, golongan-golongan ini diabaikan dan tidak akan muncul atau memengaruhi kalkulasi akhir.</span>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                <input type="checkbox" id="hasKakek" onchange="AdienFinal.calculate()"> Ada Kakek
+                            </label>
+                            <label class="p-3 border border-slate-700 rounded-xl flex items-center gap-2 cursor-pointer text-xs font-bold">
+                                <input type="checkbox" id="hasNenek" onchange="AdienFinal.calculate()"> Ada Nenek
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="paman" class="input-dark" placeholder="Jml Paman" oninput="AdienFinal.calculate()">
+                            <input type="number" id="tante" class="input-dark" placeholder="Jml Tante" oninput="AdienFinal.calculate()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7">
+                <div class="glass-card p-8 sticky top-28 border-t-8 border-blue-500 z-10 relative">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <h2 class="text-3xl font-black tracking-tighter text-white">Rincian Pembagian</h2>
+                            <p id="netDisplay" class="text-blue-400 text-lg font-bold">Rp 0</p>
+                        </div>
+                        <div class="flex bg-[#0f172a] p-1.5 rounded-2xl border border-slate-700">
+                            <button id="btnIslam" onclick="AdienFinal.setMode('islam')" class="px-6 py-2.5 rounded-xl text-xs font-black transition tab-active">HUKUM ISLAM</button>
+                            <button id="btnBW" onclick="AdienFinal.setMode('bw')" class="px-6 py-2.5 rounded-xl text-xs font-black transition tab-inactive ml-1">KUH PERDATA</button>
+                        </div>
+                    </div>
+
+                    <div id="results" class="space-y-4 min-h-[200px]"></div>
+
+                    <div class="mt-8 p-4 bg-slate-900/50 rounded-2xl border border-slate-700">
+                        <p id="disclaimer" class="text-[10px] text-slate-400 font-bold leading-relaxed uppercase"></p>
+                    </div>
+
+                    <div class="mt-6 flex gap-4">
+                        <button onclick="AdienFinal.calculate()" class="btn-prime flex-1 uppercase tracking-widest text-xs">Hitung Ulang</button>
+                        <button onclick="AdienFinal.pdf()" class="px-8 bg-white text-black font-black rounded-2xl hover:bg-slate-200 transition">UNDUH PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
 
     <script>
         const AdienFinal = {
